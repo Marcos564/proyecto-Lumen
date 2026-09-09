@@ -35,7 +35,7 @@ export function PatientForm({ initialValues = emptyValues, submitting, onSubmit 
       }}
     >
       <div className="grid grid-cols-2 gap-4">
-        <Field label="Nombre">
+        <Field label="Nombre (Mascota)">
           <input className={inputClass} value={values.name} onChange={(e) => handleChange('name', e.target.value)} required />
         </Field>
         <Field label="Especie">

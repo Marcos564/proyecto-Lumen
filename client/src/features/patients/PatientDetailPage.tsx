@@ -57,24 +57,26 @@ export function PatientDetailPage() {
           {patient.treatments.length === 0 ? (
             <p className="text-sm text-slate-400">Sin tratamientos registrados.</p>
           ) : (
-            <table className="min-w-full divide-y divide-slate-100 text-sm">
-              <thead>
-                <tr className="text-left text-slate-500">
-                  <th className="py-2 pr-4 font-medium">Tratamiento</th>
-                  <th className="py-2 pr-4 font-medium">Fecha</th>
-                  <th className="py-2 font-medium">Notas</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {patient.treatments.map((treatment) => (
-                  <tr key={treatment.id}>
-                    <td className="py-2 pr-4 text-slate-700">{treatment.name}</td>
-                    <td className="py-2 pr-4 text-slate-500">{treatment.date}</td>
-                    <td className="py-2 text-slate-500">{treatment.notes || '—'}</td>
+            <div className="overflow-x-auto border border-slate-300">
+              <table className="min-w-full divide-y divide-slate-200 text-sm">
+                <thead className="bg-teal-600">
+                  <tr className="text-left">
+                    <th className="px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-white">Tratamiento</th>
+                    <th className="px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-white">Fecha</th>
+                    <th className="px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-white">Notas</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {patient.treatments.map((treatment) => (
+                    <tr key={treatment.id} className="odd:bg-white even:bg-slate-50">
+                      <td className="px-4 py-2.5 text-slate-700">{treatment.name}</td>
+                      <td className="px-4 py-2.5 text-slate-500">{treatment.date}</td>
+                      <td className="px-4 py-2.5 text-slate-500">{treatment.notes || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </Card>
       )}
@@ -84,24 +86,26 @@ export function PatientDetailPage() {
           {patient.vaccines.length === 0 ? (
             <p className="text-sm text-slate-400">Sin vacunas registradas.</p>
           ) : (
-            <table className="min-w-full divide-y divide-slate-100 text-sm">
-              <thead>
-                <tr className="text-left text-slate-500">
-                  <th className="py-2 pr-4 font-medium">Vacuna</th>
-                  <th className="py-2 pr-4 font-medium">Aplicada</th>
-                  <th className="py-2 font-medium">Próxima dosis</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {patient.vaccines.map((vaccine) => (
-                  <tr key={vaccine.id}>
-                    <td className="py-2 pr-4 text-slate-700">{vaccine.name}</td>
-                    <td className="py-2 pr-4 text-slate-500">{vaccine.dateApplied}</td>
-                    <td className="py-2 text-slate-500">{vaccine.nextDueDate || '—'}</td>
+            <div className="overflow-x-auto border border-slate-300">
+              <table className="min-w-full divide-y divide-slate-200 text-sm">
+                <thead className="bg-teal-600">
+                  <tr className="text-left">
+                    <th className="px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-white">Vacuna</th>
+                    <th className="px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-white">Aplicada</th>
+                    <th className="px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-white">Próxima dosis</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {patient.vaccines.map((vaccine) => (
+                    <tr key={vaccine.id} className="odd:bg-white even:bg-slate-50">
+                      <td className="px-4 py-2.5 text-slate-700">{vaccine.name}</td>
+                      <td className="px-4 py-2.5 text-slate-500">{vaccine.dateApplied}</td>
+                      <td className="px-4 py-2.5 text-slate-500">{vaccine.nextDueDate || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </Card>
       )}

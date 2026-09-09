@@ -101,7 +101,7 @@ export function PatientsListPage() {
         onRowClick={(patient) => navigate(`/pacientes/${patient.id}`)}
         emptyMessage={isLoading ? 'Cargando pacientes...' : 'No se encontraron pacientes.'}
         columns={[
-          { header: 'Nombre', render: (p) => <span className="font-medium text-slate-800">{p.name}</span> },
+          { header: 'Mascota', render: (p) => <span className="font-medium text-slate-800">{p.name}</span> },
           { header: 'Especie / Raza', render: (p) => `${p.species} · ${p.breed}` },
           { header: 'Dueño', render: (p) => p.ownerName },
           { header: 'Contacto', render: (p) => p.ownerPhone || '—' },
