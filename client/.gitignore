@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+#photos
+.claude/254224218e7591b009f137aa19cb6c9e.jpg
