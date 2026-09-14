@@ -2,8 +2,11 @@ import { useState } from 'react'
 import { Button } from '../../components/ui/Button'
 import { Field, inputClass } from '../../components/ui/Field'
 import type { PatientInput } from '../../services/patients.service'
+import type { Owner } from '../../types'
+import { ownerFullName } from '../owners/ownerFullName'
 
 interface PatientFormProps {
+  owners: Owner[]
   initialValues?: PatientInput
   submitting?: boolean
   onSubmit: (values: PatientInput) => void
@@ -14,12 +17,11 @@ const emptyValues: PatientInput = {
   species: '',
   breed: '',
   birthDate: '',
-  ownerName: '',
-  ownerPhone: '',
+  ownerId: '',
   status: 'active',
 }
 
-export function PatientForm({ initialValues = emptyValues, submitting, onSubmit }: PatientFormProps) {
+export function PatientForm({ owners, initialValues = emptyValues, submitting, onSubmit }: PatientFormProps) {
   const [values, setValues] = useState<PatientInput>(initialValues)
 
   function handleChange<K extends keyof PatientInput>(field: K, value: PatientInput[K]) {
@@ -48,10 +50,16 @@ export function PatientForm({ initialValues = emptyValues, submitting, onSubmit 
           <input type="date" className={inputClass} value={values.birthDate} onChange={(e) => handleChange('birthDate', e.target.value)} />
         </Field>
         <Field label="Dueño">
-          <input className={inputClass} value={values.ownerName} onChange={(e) => handleChange('ownerName', e.target.value)} required />
-        </Field>
-        <Field label="Teléfono">
-          <input className={inputClass} value={values.ownerPhone} onChange={(e) => handleChange('ownerPhone', e.target.value)} />
+          <select className={inputClass} value={values.ownerId} onChange={(e) => handleChange('ownerId', e.target.value)} required>
+            <option value="" disabled>
+              Seleccioná un dueño
+            </option>
+            {owners.map((owner) => (
+              <option key={owner.id} value={owner.id}>
+                {ownerFullName(owner)} · DNI {owner.dni}
+              </option>
+            ))}
+          </select>
         </Field>
         <Field label="Estado">
           <select className={inputClass} value={values.status} onChange={(e) => handleChange('status', e.target.value as PatientInput['status'])}>

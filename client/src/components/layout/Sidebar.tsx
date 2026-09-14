@@ -1,9 +1,10 @@
-import { PawPrint, Stethoscope, CalendarDays, Package } from 'lucide-react'
+import { PawPrint, Users, Stethoscope, CalendarDays, Package } from 'lucide-react'
 import { SidebarItem } from './SidebarItem'
 import { SidebarUser } from './SidebarUser'
 
 const navItems = [
   { to: '/pacientes', label: 'Pacientes', icon: PawPrint },
+  { to: '/duenos', label: 'Dueños', icon: Users },
   { to: '/especialistas', label: 'Especialistas', icon: Stethoscope },
   { to: '/turnos', label: 'Turnos', icon: CalendarDays },
   { to: '/inventario', label: 'Inventario', icon: Package },

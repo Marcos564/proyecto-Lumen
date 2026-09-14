@@ -15,7 +15,9 @@ import {
   updatePatient,
   type PatientInput,
 } from '../../services/patients.service'
+import { getOwners } from '../../services/owners.service'
 import type { Patient } from '../../types'
+import { ownerFullName } from '../owners/ownerFullName'
 import { PatientForm } from './PatientForm'
 
 export function PatientsListPage() {
@@ -29,9 +31,14 @@ export function PatientsListPage() {
     queryKey: ['patients'],
     queryFn: getPatients,
   })
+  const { data: owners = [] } = useQuery({ queryKey: ['owners'], queryFn: getOwners })
+
+  const ownersById = useMemo(() => new Map(owners.map((owner) => [owner.id, owner])), [owners])
 
   function invalidate() {
     queryClient.invalidateQueries({ queryKey: ['patients'] })
+    // La cantidad de mascotas de cada dueño depende de los pacientes.
+    queryClient.invalidateQueries({ queryKey: ['owners'] })
   }
 
   const createMutation = useMutation({
@@ -59,8 +66,14 @@ export function PatientsListPage() {
   const filteredPatients = useMemo(() => {
     const term = search.trim().toLowerCase()
     if (!term) return patients
-    return patients.filter((patient) => patient.name.toLowerCase().includes(term) || patient.ownerName.toLowerCase().includes(term))
-  }, [patients, search])
+    return patients.filter((patient) => {
+      const owner = ownersById.get(patient.ownerId)
+      return (
+        patient.name.toLowerCase().includes(term) ||
+        (owner !== undefined && (ownerFullName(owner).toLowerCase().includes(term) || owner.dni.includes(term)))
+      )
+    })
+  }, [patients, ownersById, search])
 
   function openCreateModal() {
     setEditingPatient(null)
@@ -87,13 +100,13 @@ export function PatientsListPage() {
           <h1 className="text-2xl font-semibold text-slate-800">Pacientes</h1>
           <p className="text-sm text-slate-500">Listado de mascotas registradas en la clínica.</p>
         </div>
-        <Button onClick={openCreateModal}>
+        <Button onClick={openCreateModal} disabled={owners.length === 0}>
           <Plus className="h-4 w-4" />
           Nuevo paciente
         </Button>
       </div>
 
-      <SearchInput value={search} onChange={setSearch} placeholder="Buscar por paciente o dueño..." />
+      <SearchInput value={search} onChange={setSearch} placeholder="Buscar por paciente, dueño o DNI..." />
 
       <Table<Patient>
         data={filteredPatients}
@@ -103,8 +116,14 @@ export function PatientsListPage() {
         columns={[
           { header: 'Mascota', render: (p) => <span className="font-medium text-slate-800">{p.name}</span> },
           { header: 'Especie / Raza', render: (p) => `${p.species} · ${p.breed}` },
-          { header: 'Dueño', render: (p) => p.ownerName },
-          { header: 'Contacto', render: (p) => p.ownerPhone || '—' },
+          {
+            header: 'Dueño',
+            render: (p) => {
+              const owner = ownersById.get(p.ownerId)
+              return owner ? ownerFullName(owner) : '—'
+            },
+          },
+          { header: 'Contacto', render: (p) => ownersById.get(p.ownerId)?.phone ?? '—' },
           {
             header: 'Estado',
             render: (p) => <Badge tone={p.status === 'active' ? 'success' : 'neutral'}>{p.status === 'active' ? 'Activo' : 'Inactivo'}</Badge>,
@@ -124,6 +143,7 @@ export function PatientsListPage() {
 
       <Modal open={isModalOpen} title={editingPatient ? 'Editar paciente' : 'Nuevo paciente'} onClose={() => setModalOpen(false)}>
         <PatientForm
+          owners={owners}
           initialValues={editingPatient ?? undefined}
           onSubmit={handleSubmit}
           submitting={createMutation.isPending || updateMutation.isPending}

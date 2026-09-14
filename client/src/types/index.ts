@@ -12,6 +12,16 @@ export interface Vaccine {
   nextDueDate?: string
 }
 
+export interface Owner {
+  id: string
+  firstName: string
+  lastName: string
+  dni: string
+  address: string
+  phone: string
+  email?: string
+}
+
 export type PatientStatus = 'active' | 'inactive'
 
 export interface Patient {
@@ -20,8 +30,7 @@ export interface Patient {
   species: string
   breed: string
   birthDate?: string
-  ownerName: string
-  ownerPhone?: string
+  ownerId: string
   status: PatientStatus
   treatments: Treatment[]
   vaccines: Vaccine[]
@@ -41,7 +50,6 @@ export type AppointmentStatus = 'scheduled' | 'completed' | 'cancelled'
 export interface Appointment {
   id: string
   patientId: string
-  specialistId: string
   date: string
   reason: string
   status: AppointmentStatus
