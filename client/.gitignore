@@ -9,7 +9,6 @@ lerna-debug.log*
 
 # Dependencies
 *.tsbuildinfo
-*.lock
 node_modules
 dist
 dist-ssr
