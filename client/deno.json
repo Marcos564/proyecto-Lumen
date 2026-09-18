@@ -1,0 +1,39 @@
+{
+  "name": "ejemplo",
+  "version": "0.0.0",
+  "nodeModulesDir": "auto",
+  "lint": {
+    "include": ["src/"],
+    "exclude": ["src/testdata/", "src/fixtures/**/*.ts"],
+    "rules": {
+      "tags": ["recommended"],
+      "include": ["ban-untagged-todo"],
+      "exclude": ["no-unused-vars"]
+    }
+  },
+  "tasks": {
+    "dev": "deno run -A npm:vite",
+    "build": "deno run -A npm:typescript/tsc -b && deno run -A npm:vite build",
+    "lint": "deno run -A npm:oxlint",
+    "preview": "deno run -A npm:vite preview",
+    "start": "deno task build && deno task preview"
+  },
+  "imports": {
+    "@deno/vite-plugin": "npm:@deno/vite-plugin@^2.0.3",
+    "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.3.3",
+    "@tanstack/react-query": "npm:@tanstack/react-query@^5.103.1",
+    "@types/react": "npm:@types/react@^19.3.0",
+    "@types/react-dom": "npm:@types/react-dom@^19.3.0",
+    "@vitejs/plugin-react": "npm:@vitejs/plugin-react@^6.1.1",
+    "axios": "npm:axios@^1.20.0",
+    "lucide-react": "npm:lucide-react@^1.46.0",
+    "oxlint": "npm:oxlint@^1.83.0",
+    "react": "npm:react@^19.3.0",
+    "react-dom": "npm:react-dom@^19.3.0",
+    "react-router-dom": "npm:react-router-dom@^7.18.4",
+    "tailwindcss": "npm:tailwindcss@^4.3.3",
+    "vite": "npm:vite@^8.3.0",
+
+    "@/": "./src/"
+  }
+}
