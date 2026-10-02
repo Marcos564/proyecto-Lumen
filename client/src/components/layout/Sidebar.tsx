@@ -1,14 +1,20 @@
-import { PawPrint, Users, Stethoscope, CalendarDays, Package } from 'lucide-react'
-import { SidebarItem } from './SidebarItem'
-import { SidebarUser } from './SidebarUser'
+import {
+  CalendarDays,
+  Package,
+  PawPrint,
+  Stethoscope,
+  Users,
+} from "lucide-react";
+import { SidebarItem } from "./SidebarItem";
+import { SidebarUser } from "./SidebarUser";
 
 const navItems = [
-  { to: '/pacientes', label: 'Pacientes', icon: PawPrint },
-  { to: '/duenos', label: 'Dueños', icon: Users },
-  { to: '/especialistas', label: 'Especialistas', icon: Stethoscope },
-  { to: '/turnos', label: 'Turnos', icon: CalendarDays },
-  { to: '/inventario', label: 'Inventario', icon: Package },
-]
+  { to: "/pacientes", label: "Pacientes", icon: PawPrint },
+  { to: "/duenos", label: "Dueños", icon: Users },
+  { to: "/especialistas", label: "Especialistas", icon: Stethoscope },
+  { to: "/turnos", label: "Turnos", icon: CalendarDays },
+  { to: "/inventario", label: "Inventario", icon: Package },
+];
 
 export function Sidebar() {
   return (
@@ -18,11 +24,9 @@ export function Sidebar() {
         <span className="text-lg font-semibold text-white">Lumen</span>
       </div>
       <nav className="flex flex-1 flex-col gap-1">
-        {navItems.map((item) => (
-          <SidebarItem key={item.to} {...item} />
-        ))}
+        {navItems.map((item) => <SidebarItem key={item.to} {...item} />)}
       </nav>
       <SidebarUser />
     </aside>
-  )
+  );
 }

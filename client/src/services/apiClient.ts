@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from "axios";
 
 /**
  * Cliente HTTP ya configurado para el día que exista la API real en C# / ASP.NET Core.
@@ -7,8 +7,8 @@ import axios from 'axios'
  * llamadas a este `apiClient` y setear VITE_API_BASE_URL.
  */
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? '',
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? "",
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
-})
+});
