@@ -1,8 +1,9 @@
 import axios from "axios";
-import { getConfig } from "../index.ts";
-const config = getConfig();
+//import { getConfig } from "../index.ts";
+//const config = getConfig();
+//TODO: HACER
 const instance = axios.create({
-  baseURL: config.apiUrl,
+  baseURL: "127..0",
   withCredentials: true,
 });
 

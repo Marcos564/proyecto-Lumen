@@ -3,7 +3,6 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { AppLayout } from "./layouts/AppLayout";
 import { FallbackLoading } from "./shared/components/FallbackLoading";
 import AuthLayout from "./layouts/AuthLayout";
-
 const PatientsListPage = lazy(() =>
   import("./features/patients/PatientsListPage").then((module) => ({
     default: module.PatientsListPage,
@@ -47,6 +46,14 @@ const InventoryPage = lazy(() =>
 const OwnersListPage = lazy(() =>
   import("./features/owners/OwnersListPage").then((module) => ({
     default: module.OwnersListPage,
+  })).catch((error) => {
+    console.error("Error loading OwnersListPage:", error);
+    return { default: () => <div>Error loading OwnersListPage</div> };
+  })
+);
+const ComponenteInfinito = lazy(() =>
+  import("./shared/components/FallbackActive").then((module) => ({
+    default: module.ComponenteInfinito,
   })).catch((error) => {
     console.error("Error loading OwnersListPage:", error);
     return { default: () => <div>Error loading OwnersListPage</div> };
@@ -122,8 +129,18 @@ export const Routes = createBrowserRouter([
   {
     path: "/auth",
     element: <AuthLayout />,
-    children: [
-      
-    ]
+    children:[
+      {
+        index:true,
+      },
+      {
+        path: "login",
+        element: (
+          <Suspense fallback={<FallbackLoading />}>
+            <ComponenteInfinito />
+          </Suspense>
+        )
+      }
+    ] 
   }
 ]);

@@ -1,5 +1,6 @@
-                                                                                                         C @XC importXC "tailwindcss";
- @theme  {
+
+@import "tailwindcss";
+@theme  {
   /* Color Principal (Verde Turquesa / Lumen Teal) */
   --color-lumen-50: #f0fdfa;
   --color-lumen-100: #ccfbf1;
