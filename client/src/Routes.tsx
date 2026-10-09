@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { AppLayout } from "./layouts/AppLayout";
 import { FallbackLoading } from "./shared/components/FallbackLoading";
+import AuthLayout from "./layouts/AuthLayout";
 
 const PatientsListPage = lazy(() =>
   import("./features/patients/PatientsListPage").then((module) => ({
@@ -118,4 +119,11 @@ export const Routes = createBrowserRouter([
       },
     ],
   },
+  {
+    path: "/auth",
+    element: <AuthLayout />,
+    children: [
+      
+    ]
+  }
 ]);
