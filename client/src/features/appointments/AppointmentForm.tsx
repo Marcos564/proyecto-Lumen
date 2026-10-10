@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Button } from '../../components/ui/Button'
 import { Field, inputClass } from '../../components/ui/Field'
 import type { AppointmentInput } from '../../services/appointments.service'
+import { isPastDateTime, nowDateTimeValue } from '../../services/dateTime'
 import type { AppointmentStatus, Owner, Patient } from '../../types'
 import { ownerFullName } from '../owners/ownerFullName'
 
@@ -9,6 +10,7 @@ interface AppointmentFormProps {
   patients: Patient[]
   owners: Owner[]
   initialValues?: AppointmentInput
+  error?: string
   submitting?: boolean
   onSubmit: (values: AppointmentInput) => void
 }
@@ -23,21 +25,38 @@ function buildEmptyValues(patients: Patient[]): AppointmentInput {
 }
 
 const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'))
-const minutes = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'))
+// Los turnos se agendan cada 5 minutos: 60 opciones sueltas eran imposibles de recorrer.
+const minutes = Array.from({ length: 12 }, (_, i) => String(i * 5).padStart(2, '0'))
+const lastMinute = minutes[minutes.length - 1]
 
-export function AppointmentForm({ patients, owners, initialValues, submitting, onSubmit }: AppointmentFormProps) {
+export function AppointmentForm({ patients, owners, initialValues, error, submitting, onSubmit }: AppointmentFormProps) {
   const [values, setValues] = useState<AppointmentInput>(initialValues ?? buildEmptyValues(patients))
+  const [pastDateError, setPastDateError] = useState('')
   const ownersById = new Map(owners.map((owner) => [owner.id, owner]))
 
   // La fecha se guarda como "YYYY-MM-DDTHH:mm" (24 h); se edita en partes para no depender del formato AM/PM del navegador.
   const [datePart = '', timePart = ''] = values.date.split('T')
   const [hourPart = '', minutePart = ''] = timePart.split(':')
 
+  // Un turno nuevo no puede quedar en el pasado. Al editar uno existente no se restringe,
+  // porque los turnos ya pasados tienen que poder seguir corrigiéndose.
+  const isEditing = Boolean(initialValues)
+  const now = nowDateTimeValue()
+  const [today, nowTime] = now.split('T')
+  const [nowHour, nowMinute] = nowTime.split(':')
+  const isToday = !isEditing && datePart === today
+
+  // Un turno ya cargado puede tener minutos fuera de la grilla de a 5 (p. ej. 17:03): se agrega su valor para no perderlo al editar.
+  const minuteOptions = minutePart && !minutes.includes(minutePart) ? [...minutes, minutePart].sort() : minutes
+  // Una hora de hoy se descarta cuando ya no queda ningún minuto seleccionable dentro de ella.
+  const isHourPast = (hour: string) => isToday && `${hour}:${lastMinute}` < nowTime
+
   function handleChange<K extends keyof AppointmentInput>(field: K, value: AppointmentInput[K]) {
     setValues((prev) => ({ ...prev, [field]: value }))
   }
 
   function handleDateTimeChange(date: string, hour: string, minute: string) {
+    setPastDateError('')
     handleChange('date', `${date}T${hour}:${minute}`)
   }
 
@@ -46,6 +65,12 @@ export function AppointmentForm({ patients, owners, initialValues, submitting, o
       className="flex flex-col gap-4"
       onSubmit={(e) => {
         e.preventDefault()
+        // Se vuelve a leer la hora actual al enviar: el modal pudo quedar abierto un rato.
+        if (!isEditing && isPastDateTime(values.date)) {
+          setPastDateError('El turno no puede quedar en una fecha u hora que ya pasó.')
+          return
+        }
+        setPastDateError('')
         onSubmit(values)
       }}
     >
@@ -67,6 +92,7 @@ export function AppointmentForm({ patients, owners, initialValues, submitting, o
             type="date"
             className={inputClass}
             value={datePart}
+            min={isEditing ? undefined : today}
             onChange={(e) => handleDateTimeChange(e.target.value, hourPart, minutePart)}
             required
           />
@@ -84,7 +110,7 @@ export function AppointmentForm({ patients, owners, initialValues, submitting, o
                 HH
               </option>
               {hours.map((hour) => (
-                <option key={hour} value={hour}>
+                <option key={hour} value={hour} disabled={isHourPast(hour)}>
                   {hour}
                 </option>
               ))}
@@ -100,8 +126,8 @@ export function AppointmentForm({ patients, owners, initialValues, submitting, o
               <option value="" disabled>
                 mm
               </option>
-              {minutes.map((minute) => (
-                <option key={minute} value={minute}>
+              {minuteOptions.map((minute) => (
+                <option key={minute} value={minute} disabled={isToday && hourPart === nowHour && minute < nowMinute}>
                   {minute}
                 </option>
               ))}
@@ -119,6 +145,7 @@ export function AppointmentForm({ patients, owners, initialValues, submitting, o
           <input className={inputClass} value={values.reason} onChange={(e) => handleChange('reason', e.target.value)} required />
         </Field>
       </div>
+      {(pastDateError || error) && <p className="text-sm text-red-600">{pastDateError || error}</p>}
       <div className="flex justify-end gap-2 pt-2">
         <Button type="submit" disabled={submitting}>
           {submitting ? 'Guardando...' : 'Guardar'}

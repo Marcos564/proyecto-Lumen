@@ -86,6 +86,7 @@ export function AppointmentsPage() {
   }
 
   const canCreateAppointment = patients.length > 0
+  const formError = (createMutation.error ?? updateMutation.error)?.message
 
   return (
     <div className="flex flex-col gap-6">
@@ -137,6 +138,7 @@ export function AppointmentsPage() {
           patients={patients}
           owners={owners}
           initialValues={editingAppointment ?? undefined}
+          error={formError}
           onSubmit={handleSubmit}
           submitting={createMutation.isPending || updateMutation.isPending}
         />

@@ -1,6 +1,7 @@
 import type { Appointment, AppointmentStatus } from '../types'
 import { appointmentsMock } from './mock/appointments.mock'
 import { delay } from './mock/delay'
+import { isPastDateTime } from './dateTime'
 
 let appointments: Appointment[] = [...appointmentsMock]
 
@@ -20,6 +21,7 @@ export async function getAppointments(): Promise<Appointment[]> {
 
 export async function createAppointment(data: AppointmentInput): Promise<Appointment> {
   assertValidDate(data.date)
+  if (isPastDateTime(data.date)) throw new Error('No se puede agendar un turno en una fecha u hora que ya pasó.')
   await delay()
   const newAppointment: Appointment = { ...data, id: crypto.randomUUID() }
   appointments = [...appointments, newAppointment]
