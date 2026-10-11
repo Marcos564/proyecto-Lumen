@@ -1,13 +1,12 @@
-
 @import "tailwindcss";
-@theme  {
+@theme {
   /* Color Principal (Verde Turquesa / Lumen Teal) */
   --color-lumen-50: #f0fdfa;
   --color-lumen-100: #ccfbf1;
   --color-lumen-200: #99f6e4;
   --color-lumen-300: #5eead4;
   --color-lumen-400: #2dd4bf;
-  --color-lumen-500: #00a896; 
+  --color-lumen-500: #00a896;
   --color-lumen-600: #008f80;
   --color-lumen-700: #0f766e;
   --color-lumen-800: #115e59;

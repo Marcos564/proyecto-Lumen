@@ -8,14 +8,13 @@ export const authService = {
   signIn: async (data: SignInRequest): Promise<SignInResponse> => {
     try {
       const response = await instance.post<SignInResponse>(
-        "/auth/signin",
+        "/auth/signin/",
         data,
       );
       return response.data;
     } catch (error) {
       console.error("Error logging in:", error);
       handleConnectionError(error, "login");
-
       // OBLIGATORIO: Volver a lanzar el error para que el Caller (Context o Form) sepa que falló
       throw error;
     }

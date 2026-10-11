@@ -7,7 +7,6 @@ export interface User {
 export interface SignInRequest {
   email: string;
   password: string;
-  rememberMe: boolean;
 }
 export interface SignUpRequest {
   name: string;
@@ -25,6 +24,6 @@ export interface User {
   petName?: string;
 }
 export interface SignInResponse {
-  token: string;
+  accessToken: string;
   date: Date;
 }

@@ -1,10 +1,12 @@
-interface RingSpinnerProps{
-  color?: string,
-  size?: number
-  classname?: string
+interface RingSpinnerProps {
+  color?: string;
+  size?: number;
+  classname?: string;
 }
 
-export const RingSpinner = ({ color = "#00b4d8", size = 52, classname = "" } : RingSpinnerProps) => (
+export const RingSpinner = (
+  { color = "#00b4d8", size = 52, classname = "" }: RingSpinnerProps,
+) => (
   <svg
     width={size}
     height={size}

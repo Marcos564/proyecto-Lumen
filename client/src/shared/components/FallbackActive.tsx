@@ -1,5 +1,3 @@
-import React from "react";
-
 // Una promesa que nunca se resuelve (queda en estado pending eternamente)
 const promesaEterna = new Promise(() => {});
 

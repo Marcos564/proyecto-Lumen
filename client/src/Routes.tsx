@@ -51,6 +51,14 @@ const OwnersListPage = lazy(() =>
     return { default: () => <div>Error loading OwnersListPage</div> };
   })
 );
+const LoginPage = lazy(() =>
+  import("./features/auth/page/LoginPage").then((module) => ({
+    default: module.LoginPage,
+  })).catch((error) => {
+    console.error("Error loading LoginPage:", error);
+    return { default: () => <div>Error loading LoginPage</div> };
+  })
+);
 const ComponenteInfinito = lazy(() =>
   import("./shared/components/FallbackActive").then((module) => ({
     default: module.ComponenteInfinito,
@@ -129,18 +137,26 @@ export const Routes = createBrowserRouter([
   {
     path: "/auth",
     element: <AuthLayout />,
-    children:[
+    children: [
       {
-        index:true,
+        index: true,
+      },
+      {
+        path: "loading",
+        element: (
+          <Suspense fallback={<FallbackLoading />}>
+            <ComponenteInfinito />
+          </Suspense>
+        ),
       },
       {
         path: "login",
         element: (
           <Suspense fallback={<FallbackLoading />}>
-            <ComponenteInfinito />
+            <LoginPage />
           </Suspense>
-        )
-      }
-    ] 
-  }
+        ),
+      },
+    ],
+  },
 ]);

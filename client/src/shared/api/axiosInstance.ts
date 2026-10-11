@@ -1,12 +1,18 @@
 import axios from "axios";
-//import { getConfig } from "../index.ts";
-//const config = getConfig();
-//TODO: HACER
-const instance = axios.create({
-  baseURL: "127..0",
-  withCredentials: true,
-});
+import { getConfig } from "../index.ts";
 
+const instance = axios.create({
+  withCredentials: false,
+});
+instance.interceptors.request.use(async (config) => {
+  const envConfig = await getConfig(); // Si es async
+  config.baseURL = `${envConfig.getUrl()}/api/`;
+  console.log(
+    "axiosInstance.baseURL configurada para esta petición:",
+    config.baseURL,
+  );
+  return config;
+});
 instance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");

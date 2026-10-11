@@ -1,121 +1,114 @@
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useState } from "react";
-import {
-  EyeIcon,
-  EyeOffIcon,
-  LockIcon,
-  MailIcon,
-  PawIcon,
-  type SignInRequest,
-} from "../index.ts";
+import { useAuth } from "../../../shared";
+import { Button } from "../../../components/ui/Button";
+import { type SubmitHandler, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod"; // Asegúrate de tener este paquete instalado
+import z from "zod";
+
+export const loginSchema = z.object({
+  email: z.string().email("Email inválido"),
+  password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
+  rememberMe: z.boolean().optional(),
+});
+
+export type LoginFormData = z.infer<typeof loginSchema>;
+
 interface LoginFormProps {
-  onSubmit: (data: SignInRequest) => void;
-  isLoading: boolean;
-  onForgotPassword: () => void;
+  onSubmit: SubmitHandler<LoginFormData>;
 }
-export function LoginForm(
-  { onSubmit, isLoading, onForgotPassword }: LoginFormProps,
-) {
-  const [formData, setFormData] = useState<SignInRequest>({
-    email: "",
-    password: "",
-    rememberMe: true,
-  });
+
+export function LoginForm({ onSubmit }: LoginFormProps): React.ReactElement {
+  const { isLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    onSubmit(formData);
-  };
+  // Inicializamos useForm y el validador de Zod aquí mismo de forma unificada
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Email Input */}
-      <div>
-        <label className="block text-xs font-bold text-gray-600 uppercase mb-1">
-          Correo Electrónico
-        </label>
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-            <MailIcon className="w-5 h-5 text-[#83CFD3]" />
-          </div>
-          <input
-            type="email"
-            required
-            placeholder="ejemplo@mascota.com"
-            value={formData.email}
-            onChange={(e) =>
-              setFormData({ ...formData, email: e.target.value })}
-            className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#83CFD3] focus:bg-white transition-all"
-          />
-        </div>
+    <div className="max-w-md mx-auto p-8 bg-white rounded-2xl shadow-xl border border-gray-100">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-800">¡Hola de nuevo!</h2>
+        <p className="text-sm text-gray-500 mt-1">
+          Por favor, ingrese sus credenciales de autenticación.
+        </p>
       </div>
 
-      {/* Password Input */}
-      <div>
-        <label className="block text-xs font-bold text-gray-600 uppercase mb-1">
-          Contraseña
-        </label>
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-            <LockIcon className="w-5 h-5 text-[#83CFD3]" />
+      {/* Usamos un formulario estándar de HTML conectado a handleSubmit de react-hook-form */}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {/* Campo de Correo Electrónico */}
+        <div>
+          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
+            Correo Electrónico
+          </label>
+          <div className="relative flex items-center">
+            <span className="absolute left-3 text-gray-400 pointer-events-none">
+              <Mail size={18} />
+            </span>
+            <input
+              type="email"
+              placeholder="ejemplo@correo.com"
+              {...register("email")}
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white text-sm text-gray-800 transition-all"
+            />
           </div>
-          <input
-            type={showPassword ? "text" : "password"}
-            required
-            placeholder="••••••••"
-            value={formData.password}
-            onChange={(e) =>
-              setFormData({ ...formData, password: e.target.value })}
-            className="w-full pl-11 pr-11 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-[#83CFD3] focus:bg-white transition-all"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600"
-          >
-            {showPassword ? <EyeOffIcon /> : <EyeIcon />}
-          </button>
+          {errors.email && (
+            <span className="text-xs text-red-500 mt-1 block ml-1">
+              {errors.email.message}
+            </span>
+          )}
         </div>
-      </div>
 
-      {/* Options Row */}
-      <div className="flex items-center justify-between text-xs pt-1">
-        <label className="flex items-center space-x-2 cursor-pointer text-gray-600 font-medium">
-          <input
-            type="checkbox"
-            checked={formData.rememberMe}
-            onChange={(e) =>
-              setFormData({ ...formData, rememberMe: e.target.checked })}
-            className="rounded text-[#008C99] focus:ring-[#83CFD3] w-4 h-4"
-          />
-          <span>Recordarme</span>
-        </label>
-        <button
-          type="button"
-          onClick={onForgotPassword}
-          className="text-[#008C99] font-bold hover:underline"
+        {/* Campo de Contraseña */}
+        <div>
+          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
+            Contraseña
+          </label>
+          <div className="relative flex items-center">
+            <span className="absolute left-3 text-gray-400 pointer-events-none">
+              <Lock size={18} />
+            </span>
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              {...register("password")}
+              className="w-full pl-10 pr-10 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white text-sm text-gray-800 transition-all"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 text-gray-400 hover:text-gray-600 focus:outline-none"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+          {errors.password && (
+            <span className="text-xs text-red-500 mt-1 block ml-1">
+              {errors.password.message}
+            </span>
+          )}
+        </div>
+
+        {/* Botón de Envío */}
+        <Button
+          type="submit"
+          disabled={isLoading}
+          className="w-full mt-2 py-3 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-xl transition-colors shadow-md shadow-teal-600/20 flex items-center justify-center gap-2"
         >
-          ¿Olvidaste tu contraseña?
-        </button>
-      </div>
-
-      {/* Submit Button */}
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full py-3.5 bg-[#008C99] hover:bg-[#007580] text-white font-extrabold rounded-2xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center space-x-2 text-base active:scale-[0.99] disabled:opacity-50"
-      >
-        {isLoading
-          ? (
-            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-          )
-          : (
+          {isLoading ? <span>Cargando...</span> : (
             <>
-              <span>INICIAR SESIÓN</span>
-              <PawIcon className="w-5 h-5 text-white/90" />
+              <span>Confirmar Acceso</span>
+              <span>→</span>
             </>
           )}
-      </button>
-    </form>
+        </Button>
+      </form>
+    </div>
   );
 }

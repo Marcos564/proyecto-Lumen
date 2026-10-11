@@ -1,6 +1,6 @@
 import React from "react";
 import { ShieldCheck } from "lucide-react";
-import { RingSpinner, DotsSpinner, PulseSpinner } from "../index"; // Eliminada la extensión .ts
+import { RingSpinner } from "../index"; // Eliminada la extensión .ts
 
 export interface FallbackLoadingProps {
   title?: string;
@@ -16,7 +16,8 @@ export interface FallbackLoadingProps {
 
 export function FallbackLoading({
   title = "Cargando sistema...",
-  subtitle = "Por favor, espere un momento mientras verificamos las credenciales...",
+  subtitle =
+    "Por favor, espere un momento mientras verificamos las credenciales...",
   variant = "ring",
   brandColor = "#00b4d8",
   fullScreen = true,
@@ -24,21 +25,23 @@ export function FallbackLoading({
   showCard = true,
   badgeText = "SISTEMA LUMEN",
   darkMode = false,
-}: FallbackLoadingProps) {
+}: FallbackLoadingProps): React.ReactElement {
   return (
     <div
       className={`
         flex flex-col items-center justify-center transition-all duration-300
-        ${fullScreen ? "fixed inset-0 z-50 min-h-screen w-full" : "w-full py-12"}
         ${
-          blurOverlay
-            ? darkMode
-              ? "backdrop-blur-md bg-slate-950/70"
-              : "backdrop-blur-md bg-slate-50/70"
-            : darkMode
-            ? "bg-slate-950"
-            : "bg-slate-50/80"
-        }
+        fullScreen ? "fixed inset-0 z-50 min-h-screen w-full" : "w-full py-12"
+      }
+        ${
+        blurOverlay
+          ? darkMode
+            ? "backdrop-blur-md bg-slate-950/70"
+            : "backdrop-blur-md bg-slate-50/70"
+          : darkMode
+          ? "bg-slate-950"
+          : "bg-slate-50/80"
+      }
         ${darkMode ? "text-slate-100" : "text-slate-800"}
       `}
     >
@@ -47,14 +50,14 @@ export function FallbackLoading({
         className={`
           relative flex flex-col items-center text-center transition-all duration-300
           ${
-            showCard
-              ? `p-8 sm:p-10 rounded-2xl max-w-md w-11/12 shadow-xl border ${
-                  darkMode
-                    ? "bg-slate-900/90 border-slate-800/80 shadow-slate-950/50"
-                    : "bg-white/95 border-slate-200/80 shadow-slate-200/60"
-                }`
-              : "p-4 max-w-md w-full bg-transparent"
-          }
+          showCard
+            ? `p-8 sm:p-10 rounded-2xl max-w-md w-11/12 shadow-xl border ${
+              darkMode
+                ? "bg-slate-900/90 border-slate-800/80 shadow-slate-950/50"
+                : "bg-white/95 border-slate-200/80 shadow-slate-200/60"
+            }`
+            : "p-4 max-w-md w-full bg-transparent"
+        }
         `}
       >
         {/* Badge institucional */}
@@ -63,13 +66,16 @@ export function FallbackLoading({
             className={`
               inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold tracking-wider uppercase mb-6
               ${
-                darkMode
-                  ? "bg-slate-800/80 text-slate-300 border border-slate-700"
-                  : "bg-slate-100 text-slate-600 border border-slate-200"
-              }
+              darkMode
+                ? "bg-slate-800/80 text-slate-300 border border-slate-700"
+                : "bg-slate-100 text-slate-600 border border-slate-200"
+            }
             `}
           >
-            <ShieldCheck className="w-3.5 h-3.5" style={{ color: brandColor }} />
+            <ShieldCheck
+              className="w-3.5 h-3.5"
+              style={{ color: brandColor }}
+            />
             <span>{badgeText}</span>
           </div>
         )}
