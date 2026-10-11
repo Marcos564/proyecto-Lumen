@@ -2,7 +2,7 @@ import { lazy, Suspense } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { AppLayout } from "./layouts/AppLayout";
 import { FallbackLoading } from "./shared/components/FallbackLoading";
-
+import AuthLayout from "./layouts/AuthLayout";
 const PatientsListPage = lazy(() =>
   import("./features/patients/PatientsListPage").then((module) => ({
     default: module.PatientsListPage,
@@ -46,6 +46,22 @@ const InventoryPage = lazy(() =>
 const OwnersListPage = lazy(() =>
   import("./features/owners/OwnersListPage").then((module) => ({
     default: module.OwnersListPage,
+  })).catch((error) => {
+    console.error("Error loading OwnersListPage:", error);
+    return { default: () => <div>Error loading OwnersListPage</div> };
+  })
+);
+const LoginPage = lazy(() =>
+  import("./features/auth/page/LoginPage").then((module) => ({
+    default: module.LoginPage,
+  })).catch((error) => {
+    console.error("Error loading LoginPage:", error);
+    return { default: () => <div>Error loading LoginPage</div> };
+  })
+);
+const ComponenteInfinito = lazy(() =>
+  import("./shared/components/FallbackActive").then((module) => ({
+    default: module.ComponenteInfinito,
   })).catch((error) => {
     console.error("Error loading OwnersListPage:", error);
     return { default: () => <div>Error loading OwnersListPage</div> };
@@ -113,6 +129,31 @@ export const Routes = createBrowserRouter([
         element: (
           <Suspense fallback={<FallbackLoading />}>
             <OwnersListPage />
+          </Suspense>
+        ),
+      },
+    ],
+  },
+  {
+    path: "/auth",
+    element: <AuthLayout />,
+    children: [
+      {
+        index: true,
+      },
+      {
+        path: "loading",
+        element: (
+          <Suspense fallback={<FallbackLoading />}>
+            <ComponenteInfinito />
+          </Suspense>
+        ),
+      },
+      {
+        path: "login",
+        element: (
+          <Suspense fallback={<FallbackLoading />}>
+            <LoginPage />
           </Suspense>
         ),
       },
