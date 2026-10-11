@@ -1,65 +1,79 @@
-import { useEffect, useRef, useState } from 'react'
-import { Check, ChevronDown } from 'lucide-react'
-import { Badge } from '../../components/ui/Badge'
-import type { AppointmentStatus } from '../../types'
-import { appointmentStatuses, statusLabels, statusTones } from './appointmentStatus'
+import { useEffect, useRef, useState } from "react";
+import { Check, ChevronDown } from "lucide-react";
+import { Badge } from "../../components/ui/Badge";
+import type { AppointmentStatus } from "../../types";
+import {
+  appointmentStatuses,
+  statusLabels,
+  statusTones,
+} from "./appointmentStatus";
 
-const MENU_HEIGHT = 140
+const MENU_HEIGHT = 140;
 
 interface AppointmentStatusPopoverProps {
-  status: AppointmentStatus
-  disabled?: boolean
-  onChange: (status: AppointmentStatus) => void
+  status: AppointmentStatus;
+  disabled?: boolean;
+  onChange: (status: AppointmentStatus) => void;
 }
 
-export function AppointmentStatusPopover({ status, disabled, onChange }: AppointmentStatusPopoverProps) {
-  const buttonRef = useRef<HTMLButtonElement>(null)
-  const menuRef = useRef<HTMLDivElement>(null)
-  const [position, setPosition] = useState<{ top: number; left: number; openUp: boolean } | null>(null)
+export function AppointmentStatusPopover(
+  { status, disabled, onChange }: AppointmentStatusPopoverProps,
+) {
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState<
+    { top: number; left: number; openUp: boolean } | null
+  >(null);
 
-  const isOpen = position !== null
+  const isOpen = position !== null;
 
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) return;
 
     function close() {
-      setPosition(null)
+      setPosition(null);
     }
     function handleMouseDown(event: MouseEvent) {
-      const target = event.target as Node
-      if (menuRef.current?.contains(target) || buttonRef.current?.contains(target)) return
-      close()
+      const target = event.target as Node;
+      if (
+        menuRef.current?.contains(target) || buttonRef.current?.contains(target)
+      ) return;
+      close();
     }
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') close()
+      if (event.key === "Escape") close();
     }
 
-    document.addEventListener('mousedown', handleMouseDown)
-    document.addEventListener('keydown', handleKeyDown)
-    window.addEventListener('scroll', close, true)
-    window.addEventListener('resize', close)
+    document.addEventListener("mousedown", handleMouseDown);
+    document.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("scroll", close, true);
+    window.addEventListener("resize", close);
     return () => {
-      document.removeEventListener('mousedown', handleMouseDown)
-      document.removeEventListener('keydown', handleKeyDown)
-      window.removeEventListener('scroll', close, true)
-      window.removeEventListener('resize', close)
-    }
-  }, [isOpen])
+      document.removeEventListener("mousedown", handleMouseDown);
+      document.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("resize", close);
+    };
+  }, [isOpen]);
 
   function toggle() {
     if (isOpen) {
-      setPosition(null)
-      return
+      setPosition(null);
+      return;
     }
-    const rect = buttonRef.current?.getBoundingClientRect()
-    if (!rect) return
-    const openUp = rect.bottom + MENU_HEIGHT > window.innerHeight
-    setPosition({ top: openUp ? rect.top - 4 : rect.bottom + 4, left: rect.left, openUp })
+    const rect = buttonRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const openUp = rect.bottom + MENU_HEIGHT > window.innerHeight;
+    setPosition({
+      top: openUp ? rect.top - 4 : rect.bottom + 4,
+      left: rect.left,
+      openUp,
+    });
   }
 
   function select(next: AppointmentStatus) {
-    setPosition(null)
-    if (next !== status) onChange(next)
+    setPosition(null);
+    if (next !== status) onChange(next);
   }
 
   return (
@@ -85,9 +99,13 @@ export function AppointmentStatusPopover({ status, disabled, onChange }: Appoint
           ref={menuRef}
           role="menu"
           style={{ top: position.top, left: position.left }}
-          className={`fixed z-50 w-44 rounded-lg border border-slate-200 bg-white p-1 shadow-lg ${position.openUp ? '-translate-y-full' : ''}`}
+          className={`fixed z-50 w-44 rounded-lg border border-slate-200 bg-white p-1 shadow-lg ${
+            position.openUp ? "-translate-y-full" : ""
+          }`}
         >
-          <p className="px-2 py-1 text-xs font-medium tracking-wide text-slate-400 uppercase">Cambiar estado</p>
+          <p className="px-2 py-1 text-xs font-medium tracking-wide text-slate-400 uppercase">
+            Cambiar estado
+          </p>
           {appointmentStatuses.map((option) => (
             <button
               key={option}
@@ -104,5 +122,5 @@ export function AppointmentStatusPopover({ status, disabled, onChange }: Appoint
         </div>
       )}
     </>
-  )
+  );
 }

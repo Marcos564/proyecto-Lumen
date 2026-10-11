@@ -17,11 +17,11 @@ interface AppointmentFormProps {
 
 function buildEmptyValues(patients: Patient[]): AppointmentInput {
   return {
-    patientId: patients[0]?.id ?? '',
-    date: '',
-    reason: '',
-    status: 'scheduled',
-  }
+    patientId: patients[0]?.id ?? "",
+    date: "",
+    reason: "",
+    status: "scheduled",
+  };
 }
 
 const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'))
@@ -35,8 +35,8 @@ export function AppointmentForm({ patients, owners, initialValues, error, submit
   const ownersById = new Map(owners.map((owner) => [owner.id, owner]))
 
   // La fecha se guarda como "YYYY-MM-DDTHH:mm" (24 h); se edita en partes para no depender del formato AM/PM del navegador.
-  const [datePart = '', timePart = ''] = values.date.split('T')
-  const [hourPart = '', minutePart = ''] = timePart.split(':')
+  const [datePart = "", timePart = ""] = values.date.split("T");
+  const [hourPart = "", minutePart = ""] = timePart.split(":");
 
   // Un turno nuevo no puede quedar en el pasado. Al editar uno existente no se restringe,
   // porque los turnos ya pasados tienen que poder seguir corrigiéndose.
@@ -76,14 +76,19 @@ export function AppointmentForm({ patients, owners, initialValues, error, submit
     >
       <div className="grid grid-cols-2 gap-4">
         <Field label="Paciente">
-          <select className={inputClass} value={values.patientId} onChange={(e) => handleChange('patientId', e.target.value)} required>
+          <select
+            className={inputClass}
+            value={values.patientId}
+            onChange={(e) => handleChange("patientId", e.target.value)}
+            required
+          >
             {patients.map((patient) => {
-              const owner = ownersById.get(patient.ownerId)
+              const owner = ownersById.get(patient.ownerId);
               return (
                 <option key={patient.id} value={patient.id}>
-                  {patient.name} ({owner ? ownerFullName(owner) : '—'})
+                  {patient.name} ({owner ? ownerFullName(owner) : "—"})
                 </option>
-              )
+              );
             })}
           </select>
         </Field>
@@ -103,7 +108,8 @@ export function AppointmentForm({ patients, owners, initialValues, error, submit
               aria-label="Hora"
               className={inputClass}
               value={hourPart}
-              onChange={(e) => handleDateTimeChange(datePart, e.target.value, minutePart)}
+              onChange={(e) =>
+                handleDateTimeChange(datePart, e.target.value, minutePart)}
               required
             >
               <option value="" disabled>
@@ -120,7 +126,8 @@ export function AppointmentForm({ patients, owners, initialValues, error, submit
               aria-label="Minutos"
               className={inputClass}
               value={minutePart}
-              onChange={(e) => handleDateTimeChange(datePart, hourPart, e.target.value)}
+              onChange={(e) =>
+                handleDateTimeChange(datePart, hourPart, e.target.value)}
               required
             >
               <option value="" disabled>
@@ -135,22 +142,32 @@ export function AppointmentForm({ patients, owners, initialValues, error, submit
           </div>
         </Field>
         <Field label="Estado">
-          <select className={inputClass} value={values.status} onChange={(e) => handleChange('status', e.target.value as AppointmentStatus)}>
+          <select
+            className={inputClass}
+            value={values.status}
+            onChange={(e) =>
+              handleChange("status", e.target.value as AppointmentStatus)}
+          >
             <option value="scheduled">Programado</option>
             <option value="completed">Completado</option>
             <option value="cancelled">Cancelado</option>
           </select>
         </Field>
         <Field label="Motivo">
-          <input className={inputClass} value={values.reason} onChange={(e) => handleChange('reason', e.target.value)} required />
+          <input
+            className={inputClass}
+            value={values.reason}
+            onChange={(e) => handleChange("reason", e.target.value)}
+            required
+          />
         </Field>
       </div>
       {(pastDateError || error) && <p className="text-sm text-red-600">{pastDateError || error}</p>}
       <div className="flex justify-end gap-2 pt-2">
         <Button type="submit" disabled={submitting}>
-          {submitting ? 'Guardando...' : 'Guardar'}
+          {submitting ? "Guardando..." : "Guardar"}
         </Button>
       </div>
     </form>
-  )
+  );
 }
