@@ -1,5 +1,30 @@
 @import "tailwindcss";
+@theme {
+  /* Color Principal (Verde Turquesa / Lumen Teal) */
+  --color-lumen-50: #f0fdfa;
+  --color-lumen-100: #ccfbf1;
+  --color-lumen-200: #99f6e4;
+  --color-lumen-300: #5eead4;
+  --color-lumen-400: #2dd4bf;
+  --color-lumen-500: #00a896;
+  --color-lumen-600: #008f80;
+  --color-lumen-700: #0f766e;
+  --color-lumen-800: #115e59;
+  --color-lumen-900: #134e4a;
+  --color-lumen-950: #042f2e;
 
+  --color-lumen-dark-50: #f4f5f8;
+  --color-lumen-dark-100: #e3e6ed;
+  --color-lumen-dark-200: #c5cbd9;
+  --color-lumen-dark-300: #9ca6be;
+  --color-lumen-dark-400: #7481a1;
+  --color-lumen-dark-500: #556387;
+  --color-lumen-dark-600: #424e70;
+  --color-lumen-dark-700: #363f5b;
+  --color-lumen-dark-800: #212739;
+  --color-lumen-dark-900: #0f1420;
+  --color-lumen-dark-950: #090c15;
+}
 body {
   margin: 0;
 }
