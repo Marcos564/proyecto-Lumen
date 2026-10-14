@@ -3,6 +3,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { AppLayout } from "./layouts/AppLayout";
 import { FallbackLoading } from "./shared/components/FallbackLoading";
 import AuthLayout from "./layouts/AuthLayout";
+import { useAuth } from "./shared";
 const PatientsListPage = lazy(() =>
   import("./features/patients/PatientsListPage").then((module) => ({
     default: module.PatientsListPage,
@@ -67,15 +68,36 @@ const ComponenteInfinito = lazy(() =>
     return { default: () => <div>Error loading OwnersListPage</div> };
   })
 );
+const LandingPage = lazy(() =>
+  import("./features/landing/LandingPage").then((module) => ({
+    default: module.LandingPage,
+  })).catch((error) => {
+    console.error("Error loading LandingPage:", error);
+    return { default: () => <div>Error loading LandingPage</div> };
+  })
+);
+
+// Sin sesión: landing pública. Con sesión: directo al panel.
+function HomeRoute() {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated
+    ? <Navigate to="/pacientes" replace />
+    : <LandingPage />;
+}
+
 export const Routes = createBrowserRouter([
   {
     path: "/",
+    element: (
+      <Suspense fallback={<FallbackLoading />}>
+        <HomeRoute />
+      </Suspense>
+    ),
+  },
+  {
+    // Layout sin path: envuelve las páginas del panel con el Sidebar.
     element: <AppLayout />,
     children: [
-      {
-        index: true,
-        element: <Navigate to="/pacientes" replace />,
-      },
       {
         path: "pacientes",
         element: (

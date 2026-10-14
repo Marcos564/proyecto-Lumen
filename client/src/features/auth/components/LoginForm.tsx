@@ -32,16 +32,9 @@ export function LoginForm({ onSubmit }: LoginFormProps): React.ReactElement {
   });
 
   return (
-    <div className="max-w-md mx-auto p-8 bg-white rounded-2xl shadow-xl border border-gray-100">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">¡Hola de nuevo!</h2>
-        <p className="text-sm text-gray-500 mt-1">
-          Por favor, ingrese sus credenciales de autenticación.
-        </p>
-      </div>
-
-      {/* Usamos un formulario estándar de HTML conectado a handleSubmit de react-hook-form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <div>
+      {/* El saludo lo muestra UserProfileHeader; acá va solo el formulario. */}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         {/* Campo de Correo Electrónico */}
         <div>
           <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
@@ -55,7 +48,7 @@ export function LoginForm({ onSubmit }: LoginFormProps): React.ReactElement {
               type="email"
               placeholder="ejemplo@correo.com"
               {...register("email")}
-              className="w-full pl-10 pr-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white text-sm text-gray-800 transition-all"
+              className="w-full pl-10 pr-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white text-sm text-gray-800 transition-all"
             />
           </div>
           {errors.email && (
@@ -78,7 +71,7 @@ export function LoginForm({ onSubmit }: LoginFormProps): React.ReactElement {
               type={showPassword ? "text" : "password"}
               placeholder="••••••••"
               {...register("password")}
-              className="w-full pl-10 pr-10 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white text-sm text-gray-800 transition-all"
+              className="w-full pl-10 pr-10 py-3 bg-gray-50/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white text-sm text-gray-800 transition-all"
             />
             <button
               type="button"
