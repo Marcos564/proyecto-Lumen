@@ -386,7 +386,7 @@ export function LandingPage(): JSX.Element {
         {/* Destacados */}
         <section className="bg-lumen-50">
           <div className="h-10 rounded-b-[50%] bg-white" />
-          <div className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-4 py-16 lg:grid-cols-4">
+          <div className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-4 pt-16 pb-24 md:pb-32 lg:grid-cols-4">
             {HIGHLIGHTS.map(({ icon: Icon, value, label }) => (
               <div
                 key={label}
