@@ -76,7 +76,6 @@ const LandingPage = lazy(() =>
     return { default: () => <div>Error loading LandingPage</div> };
   })
 );
-
 // Sin sesión: landing pública. Con sesión: directo al panel.
 function HomeRoute() {
   const { isAuthenticated } = useAuth();
@@ -84,20 +83,28 @@ function HomeRoute() {
     ? <Navigate to="/pacientes" replace />
     : <LandingPage />;
 }
-
 export const Routes = createBrowserRouter([
+
   {
-    path: "/",
+    path: "/home",
     element: (
       <Suspense fallback={<FallbackLoading />}>
         <HomeRoute />
       </Suspense>
     ),
+    children: [
+      {
+        index:true
+      }
+    ]
   },
   {
-    // Layout sin path: envuelve las páginas del panel con el Sidebar.
+    path: "/",
     element: <AppLayout />,
     children: [
+      {
+        index: true,
+      },
       {
         path: "pacientes",
         element: (
@@ -162,6 +169,7 @@ export const Routes = createBrowserRouter([
     children: [
       {
         index: true,
+        element: <Navigate to="/auth/login" replace />,
       },
       {
         path: "loading",

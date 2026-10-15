@@ -2,7 +2,7 @@ import { User } from "lucide-react";
 import { useAuth } from "../../../shared";
 
 export const UserProfileHeader = () => {
-  const { jwtPayload, isAuthenticated } = useAuth();
+  const { jwtPayload, isAuthenticated, user } = useAuth();
 
   return (
     <div className="flex flex-col items-center text-center space-y-3 mb-8">
@@ -18,7 +18,7 @@ export const UserProfileHeader = () => {
       </div>
       <div>
         <h2 className="text-2xl font-bold text-slate-800 tracking-tight flex items-center justify-center gap-1.5">
-          ¡Hola, {jwtPayload ? jwtPayload?.unique_name : "Usuario"}!
+          ¡Hola, {user?.fullName || jwtPayload?.unique_name || "Usuario"}!
         </h2>
         <p className="text-sm text-slate-500 mt-1 max-w-xs mx-auto leading-relaxed">
           {isAuthenticated

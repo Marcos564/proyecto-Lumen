@@ -19,11 +19,10 @@ export interface SignUpRequest {
 }
 export interface User {
   id: string;
-  email: string;
   fullName: string;
-  petName?: string;
 }
 export interface SignInResponse {
   accessToken: string;
   date: Date;
+  user: User;
 }
