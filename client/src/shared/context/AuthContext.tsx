@@ -2,6 +2,7 @@ import {
   createContext,
   type ReactNode,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -9,6 +10,7 @@ import {
   authService,
   type SignInRequest,
   type SignInResponse,
+  type User,
 } from "../../features/auth/index.ts";
 import { jwtDecode } from "jwt-decode";
 interface AuthContextType {
@@ -17,6 +19,7 @@ interface AuthContextType {
   signIn: (data: SignInRequest) => Promise<SignInResponse>;
   signOut: () => void;
   jwtPayload: JwtPayload | null;
+  user: User | null;
 }
 export interface JwtPayload {
   "sub": string;
@@ -36,20 +39,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setTokenRaw] = useState<string | null>(() => {
     return localStorage.getItem("token");
   });
-
+  const [user, setUserRaw] = useState<User | null>(() => {
+    const userData = localStorage.getItem("user");
+    return userData ? JSON.parse(userData) : null;
+  });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return Boolean(localStorage.getItem("token"));
+    return !!localStorage.getItem("token");
   });
-
+  const setUser = (newUser: User | null) => {
+    if (newUser) {
+      localStorage.setItem("user", JSON.stringify(newUser));
+    } else {
+      localStorage.removeItem("user");
+    }
+    setUserRaw(newUser);
+  };
   // 2. Función helper para actualizar el token en localStorage y estado
   const setToken = (newToken: string | null) => {
     if (newToken) {
       localStorage.setItem("token", newToken);
-      setIsAuthenticated(true);
     } else {
       localStorage.removeItem("token");
-      setIsAuthenticated(false);
     }
     setTokenRaw(newToken);
   };
@@ -58,7 +69,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signIn = async (
     credentials: SignInRequest,
   ): Promise<SignInResponse> => {
-    debugger;
     setIsLoading(true);
     try {
       const data: SignInResponse = await authService.signIn(credentials);
@@ -76,9 +86,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // 4. SignOut
   const signOut = (): void => {
+    setIsAuthenticated(false);
     setToken(null);
+    setUser(null);
   };
-
+  
   // 5. Decodificación segura del JWT en tiempo real (evitando useState/useEffect anidados)
   const jwtPayload = useMemo<JwtPayload | null>(() => {
     if (!token) return null;
@@ -98,7 +110,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return null;
     }
   }, [token]);
-
+  // Cerrar sesion de forma automatica si el token es invalido o expirado
+  useEffect(() => {
+  if (token && !jwtPayload) {
+    signOut();
+  }
+  }, [jwtPayload, token]);
   // 6. Memorizamos el valor del contexto para optimizar rendimiento
   const value = useMemo(
     () => ({
@@ -106,11 +123,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAuthenticated,
       signIn,
       signOut,
+      user,
       jwtPayload,
     }),
     [isLoading, isAuthenticated, jwtPayload],
   );
-
+  
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

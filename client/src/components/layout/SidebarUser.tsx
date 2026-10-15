@@ -5,7 +5,7 @@ import { Button } from "../ui/Button";
 import { Link } from "../ui/Link";
 
 export function SidebarUser() {
-  const { isAuthenticated, signOut, jwtPayload } = useAuth();
+  const { isAuthenticated, signOut, jwtPayload, user } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -88,7 +88,7 @@ export function SidebarUser() {
         </span>
         <span className="min-w-0 flex-1">
           <span className="block truncate text-sm font-medium text-white">
-            {jwtPayload ? jwtPayload.unique_name : "Invitado"}
+            {user?.fullName ||  jwtPayload?.unique_name || "Invitado"}
           </span>
           <span className="block truncate text-xs text-slate-400">
             {jwtPayload
