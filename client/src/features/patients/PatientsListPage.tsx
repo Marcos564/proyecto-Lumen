@@ -11,7 +11,6 @@ import { Modal } from "../../components/ui/Modal";
 import {
   createPatient,
   deletePatient,
-  getPatients,
   type PatientInput,
   updatePatient,
 } from "../../services/patients.service";
@@ -19,6 +18,7 @@ import { getOwners } from "../../services/owners.service";
 import type { Patient } from "../../types";
 import { ownerFullName } from "../owners/ownerFullName";
 import { PatientForm } from "./PatientForm";
+import { useAllPets } from "./hooks/usePatient";
 
 export function PatientsListPage() {
   const navigate = useNavigate();
@@ -26,11 +26,7 @@ export function PatientsListPage() {
   const [search, setSearch] = useState("");
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
-
-  const { data: patients = [], isLoading } = useQuery({
-    queryKey: ["patients"],
-    queryFn: getPatients,
-  });
+  const { data: patients, isLoading } = useAllPets();
   const { data: owners = [] } = useQuery({
     queryKey: ["owners"],
     queryFn: getOwners,
@@ -72,9 +68,9 @@ export function PatientsListPage() {
 
   const filteredPatients = useMemo(() => {
     const term = search.trim().toLowerCase();
-    if (!term) return patients;
+    if (!term || patients === undefined) return patients;
     return patients.filter((patient) => {
-      const owner = ownersById.get(patient.ownerId);
+      const owner = ownersById.get(patient?.ownerId);
       return (
         patient.name.toLowerCase().includes(term) ||
         (owner !== undefined &&
@@ -123,7 +119,7 @@ export function PatientsListPage() {
         placeholder="Buscar por paciente, dueño o DNI..."
       />
 
-      <Table<Patient>
+      <Table<GetPatientsResponse[number]>
         data={filteredPatients}
         keyExtractor={(patient) => patient.id}
         onRowClick={(patient) => navigate(`/pacientes/${patient.id}`)}

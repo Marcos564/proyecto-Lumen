@@ -26,7 +26,6 @@ export function PatientForm(
     PatientFormProps,
 ) {
   const [values, setValues] = useState<PatientInput>(initialValues);
-
   function handleChange<K extends keyof PatientInput>(
     field: K,
     value: PatientInput[K],

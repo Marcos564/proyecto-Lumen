@@ -19,7 +19,7 @@ export const authService = {
       throw error;
     }
   },
-  signUp: async (data: SignUpRequest): Promise<SignUpRequest> => {
+  signUp: async (data: SignUpRequest): Promise<any> => {
     try {
       const payload = {
         email: data.email,
