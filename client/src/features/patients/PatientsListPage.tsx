@@ -1,106 +1,26 @@
-import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pencil, Plus, Trash2 } from "lucide-react";
-import { Table } from "../../components/ui/Table";
+import { Plus } from "lucide-react";
 import { SearchInput } from "../../components/ui/SearchInput";
 import { Button } from "../../components/ui/Button";
-import { IconButton } from "../../components/ui/IconButton";
-import { Badge } from "../../components/ui/Badge";
 import { Modal } from "../../components/ui/Modal";
-import {
-  createPatient,
-  deletePatient,
-  getPatients,
-  type PatientInput,
-  updatePatient,
-} from "../../services/patients.service";
-import { getOwners } from "../../services/owners.service";
-import type { Patient } from "../../types";
-import { ownerFullName } from "../owners/ownerFullName";
-import { PatientForm } from "./PatientForm";
+import { useOwners, useOwnersById } from "../owners/hooks/useOwners";
+import { useDeletePatient, usePatients } from "./hooks/usePatients";
+import { usePatientSearch } from "./hooks/usePatientSearch";
+import { usePatientFormModal } from "./hooks/usePatientFormModal";
+import { PatientsTable } from "./components/PatientsTable";
+import { PatientForm } from "./components/PatientForm";
 
 export function PatientsListPage() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const [search, setSearch] = useState("");
-  const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
-  const [isModalOpen, setModalOpen] = useState(false);
-
-  const { data: patients = [], isLoading } = useQuery({
-    queryKey: ["patients"],
-    queryFn: getPatients,
-  });
-  const { data: owners = [] } = useQuery({
-    queryKey: ["owners"],
-    queryFn: getOwners,
-  });
-
-  const ownersById = useMemo(
-    () => new Map(owners.map((owner) => [owner.id, owner])),
-    [owners],
+  const { data: patients = [], isLoading } = usePatients();
+  const { data: owners = [] } = useOwners();
+  const ownersById = useOwnersById(owners);
+  const { search, setSearch, filteredPatients } = usePatientSearch(
+    patients,
+    ownersById,
   );
-
-  function invalidate() {
-    queryClient.invalidateQueries({ queryKey: ["patients"] });
-    // La cantidad de mascotas de cada dueño depende de los pacientes.
-    queryClient.invalidateQueries({ queryKey: ["owners"] });
-  }
-
-  const createMutation = useMutation({
-    mutationFn: createPatient,
-    onSuccess: () => {
-      invalidate();
-      setModalOpen(false);
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: PatientInput }) =>
-      updatePatient(id, data),
-    onSuccess: () => {
-      invalidate();
-      setModalOpen(false);
-      setEditingPatient(null);
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: deletePatient,
-    onSuccess: invalidate,
-  });
-
-  const filteredPatients = useMemo(() => {
-    const term = search.trim().toLowerCase();
-    if (!term) return patients;
-    return patients.filter((patient) => {
-      const owner = ownersById.get(patient.ownerId);
-      return (
-        patient.name.toLowerCase().includes(term) ||
-        (owner !== undefined &&
-          (ownerFullName(owner).toLowerCase().includes(term) ||
-            owner.dni.includes(term)))
-      );
-    });
-  }, [patients, ownersById, search]);
-
-  function openCreateModal() {
-    setEditingPatient(null);
-    setModalOpen(true);
-  }
-
-  function openEditModal(patient: Patient) {
-    setEditingPatient(patient);
-    setModalOpen(true);
-  }
-
-  function handleSubmit(values: PatientInput) {
-    if (editingPatient) {
-      updateMutation.mutate({ id: editingPatient.id, data: values });
-    } else {
-      createMutation.mutate(values);
-    }
-  }
+  const formModal = usePatientFormModal();
+  const deletePatient = useDeletePatient();
 
   return (
     <div className="flex flex-col gap-6">
@@ -111,7 +31,7 @@ export function PatientsListPage() {
             Listado de mascotas registradas en la clínica.
           </p>
         </div>
-        <Button onClick={openCreateModal} disabled={owners.length === 0}>
+        <Button onClick={formModal.openCreate} disabled={owners.length === 0}>
           <Plus className="h-4 w-4" />
           Nuevo paciente
         </Button>
@@ -123,78 +43,25 @@ export function PatientsListPage() {
         placeholder="Buscar por paciente, dueño o DNI..."
       />
 
-      <Table<Patient>
-        data={filteredPatients}
-        keyExtractor={(patient) => patient.id}
+      <PatientsTable
+        patients={filteredPatients}
+        ownersById={ownersById}
+        isLoading={isLoading}
         onRowClick={(patient) => navigate(`/pacientes/${patient.id}`)}
-        emptyMessage={isLoading
-          ? "Cargando pacientes..."
-          : "No se encontraron pacientes."}
-        columns={[
-          {
-            header: "Mascota",
-            render: (p) => (
-              <span className="font-medium text-slate-800">{p.name}</span>
-            ),
-          },
-          {
-            header: "Especie / Raza",
-            render: (p) => `${p.species} · ${p.breed}`,
-          },
-          {
-            header: "Dueño",
-            render: (p) => {
-              const owner = ownersById.get(p.ownerId);
-              return owner ? ownerFullName(owner) : "—";
-            },
-          },
-          {
-            header: "Contacto",
-            render: (p) => ownersById.get(p.ownerId)?.phone ?? "—",
-          },
-          {
-            header: "Estado",
-            render: (p) => (
-              <Badge tone={p.status === "active" ? "success" : "neutral"}>
-                {p.status === "active" ? "Activo" : "Inactivo"}
-              </Badge>
-            ),
-          },
-          {
-            header: "",
-            className: "w-20",
-            render: (p) => (
-              <div
-                className="flex items-center gap-1"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <IconButton
-                  icon={Pencil}
-                  label="Editar"
-                  onClick={() => openEditModal(p)}
-                />
-                <IconButton
-                  icon={Trash2}
-                  label="Eliminar"
-                  tone="danger"
-                  onClick={() => deleteMutation.mutate(p.id)}
-                />
-              </div>
-            ),
-          },
-        ]}
+        onEdit={formModal.openEdit}
+        onDelete={(patient) => deletePatient.mutate(patient.id)}
       />
 
       <Modal
-        open={isModalOpen}
-        title={editingPatient ? "Editar paciente" : "Nuevo paciente"}
-        onClose={() => setModalOpen(false)}
+        open={formModal.isOpen}
+        title={formModal.isEditing ? "Editar paciente" : "Nuevo paciente"}
+        onClose={formModal.close}
       >
         <PatientForm
           owners={owners}
-          initialValues={editingPatient ?? undefined}
-          onSubmit={handleSubmit}
-          submitting={createMutation.isPending || updateMutation.isPending}
+          initialValues={formModal.initialValues}
+          onSubmit={formModal.submit}
+          submitting={formModal.isSubmitting}
         />
       </Modal>
     </div>
