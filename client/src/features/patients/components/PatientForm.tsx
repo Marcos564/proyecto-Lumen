@@ -4,9 +4,11 @@ import { Field, inputClass } from "../../../components/ui/Field";
 import type { PatientInput } from "../../../services/patients.service";
 import type { Owner } from "../../../types";
 import { ownerFullName } from "../../owners/ownerFullName";
+import { type Specie, type Breed, breedSpecies, species, speciesBreeds, breeds } from "../mock/breed";
 
 interface PatientFormProps {
   owners: Owner[];
+  breeds: Specie[];
   initialValues?: PatientInput;
   submitting?: boolean;
   onSubmit: (values: PatientInput) => void;
@@ -25,6 +27,7 @@ export function PatientForm(
   { owners, initialValues = emptyValues, submitting, onSubmit }:
     PatientFormProps,
 ) {
+  const [specie, setSpecie] = useState<Specie | null>(null);
   const [values, setValues] = useState<PatientInput>(initialValues);
 
   function handleChange<K extends keyof PatientInput>(
@@ -52,20 +55,42 @@ export function PatientForm(
           />
         </Field>
         <Field label="Especie">
-          <input
+           <select
             className={inputClass}
             value={values.species}
-            onChange={(e) => handleChange("species", e.target.value)}
+            onChange={(e) => {
+              handleChange("species", e.target.value);
+              var specie: Specie | null = { name: e.target.value } as Specie;
+              setSpecie(specie);
+            }}
             required
-          />
+          >
+            <option value="" disabled>
+              Seleccioná una especie
+            </option>
+            {species.map((specie) => (
+              <option key={specie.name} value={specie.name}>
+                {specie.name}
+              </option>
+            ))}
+          </select>
         </Field>
         <Field label="Raza">
-          <input
+          <select
             className={inputClass}
             value={values.breed}
             onChange={(e) => handleChange("breed", e.target.value)}
             required
-          />
+          >
+            <option value="" disabled>
+              Seleccioná una raza
+            </option>
+            {specie && breeds.map((breed) => (
+              <option key={breed.name} value={breed.name}>
+                {breed.name}
+              </option>
+            ))}
+          </select>
         </Field>
         <Field label="Fecha de nacimiento">
           <input
