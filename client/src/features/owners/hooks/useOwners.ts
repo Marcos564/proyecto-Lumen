@@ -6,7 +6,7 @@ import {
   type OwnerWithPets,
 } from "../../../services/owners.service";
 
-// Claves de caché de React Query para dueños. Usarlas siempre desde acá
+// Claves de caché de React Query para responsables. Usarlas siempre desde acá
 // para que las invalidaciones de otras features (p. ej. pacientes) coincidan.
 export const ownerKeys = {
   all: ["owners"] as const,
@@ -25,7 +25,7 @@ export function useOwner(id: string | undefined) {
   });
 }
 
-// Índice id → dueño para resolver rápido el dueño de cada paciente.
+// Índice id → responsable para resolver rápido el responsable de cada paciente.
 export function useOwnersById(owners: OwnerWithPets[]) {
   return useMemo(
     () => new Map(owners.map((owner) => [owner.id, owner])),

@@ -14,7 +14,7 @@ const HERO_IMAGE =
   "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=900&q=80";
 
 const HIGHLIGHTS = [
-  { icon: PawPrint, text: "Pacientes y dueños en un solo lugar" },
+  { icon: PawPrint, text: "Pacientes y responsables/responsables en un solo lugar" },
   { icon: CalendarDays, text: "Agenda de turnos por especialista" },
   { icon: Package, text: "Inventario de medicamentos e insumos" },
   { icon: Users, text: "Acceso por roles para todo tu equipo" },

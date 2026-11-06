@@ -33,14 +33,14 @@ export function PatientsListPage() {
         </div>
         <Button onClick={formModal.openCreate} disabled={owners.length === 0}>
           <Plus className="h-4 w-4" />
-          Nuevo paciente
+          Nuevo mascota
         </Button>
       </div>
 
       <SearchInput
         value={search}
         onChange={setSearch}
-        placeholder="Buscar por paciente, dueño o DNI..."
+        placeholder="Buscar por paciente, responsable o DNI..."
       />
 
       <PatientsTable
@@ -54,7 +54,7 @@ export function PatientsListPage() {
 
       <Modal
         open={formModal.isOpen}
-        title={formModal.isEditing ? "Editar paciente" : "Nuevo paciente"}
+        title={formModal.isEditing ? "Editar mascota" : "Nuevo mascota"}
         onClose={formModal.close}
       >
         <PatientForm

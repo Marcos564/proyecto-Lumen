@@ -38,7 +38,7 @@ export function PatientsTable(
           render: (p) => `${p.species} · ${p.breed}`,
         },
         {
-          header: "Dueño",
+          header: "Responsable",
           render: (p) => {
             const owner = ownersById.get(p.ownerId);
             return owner ? ownerFullName(owner) : "—";

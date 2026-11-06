@@ -87,14 +87,14 @@ export function OwnersListPage() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-800">Dueños</h1>
+          <h1 className="text-2xl font-semibold text-slate-800">Responsables</h1>
           <p className="text-sm text-slate-500">
             Responsables de las mascotas atendidas en la clínica.
           </p>
         </div>
         <Button onClick={() => openModal(null)}>
           <Plus className="h-4 w-4" />
-          Nuevo dueño
+          Nuevo responsable
         </Button>
       </div>
 
@@ -108,8 +108,8 @@ export function OwnersListPage() {
         data={filteredOwners}
         keyExtractor={(o) => o.id}
         emptyMessage={isLoading
-          ? "Cargando dueños..."
-          : "No se encontraron dueños."}
+          ? "Cargando responsables..."
+          : "No se encontraron Responsables."}
         columns={[
           {
             header: "Nombre",
@@ -152,7 +152,7 @@ export function OwnersListPage() {
 
       <Modal
         open={isModalOpen}
-        title={editingOwner ? "Editar dueño" : "Nuevo dueño"}
+        title={editingOwner ? "Editar responsable" : "Nuevo responsable"}
         onClose={() => setModalOpen(false)}
       >
         <OwnerForm

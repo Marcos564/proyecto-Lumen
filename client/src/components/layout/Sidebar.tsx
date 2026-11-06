@@ -10,7 +10,7 @@ import { SidebarUser } from "./SidebarUser";
 
 const navItems = [
   { to: "/pets", label: "Pacientes", icon: PawPrint },
-  { to: "/owners", label: "Dueños", icon: Users },
+  { to: "/owners", label: "Responsables", icon: Users },
   { to: "/staff", label: "Especialistas", icon: Stethoscope },
   { to: "/appointments", label: "Turnos", icon: CalendarDays },
   { to: "/stock", label: "Inventario", icon: Package },

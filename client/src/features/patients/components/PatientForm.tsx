@@ -75,7 +75,7 @@ export function PatientForm(
             onChange={(e) => handleChange("birthDate", e.target.value)}
           />
         </Field>
-        <Field label="Dueño">
+        <Field label="Responsable">
           <select
             className={inputClass}
             value={values.ownerId}
@@ -83,7 +83,7 @@ export function PatientForm(
             required
           >
             <option value="" disabled>
-              Seleccioná un dueño
+              Seleccioná un responsable
             </option>
             {owners.map((owner) => (
               <option key={owner.id} value={owner.id}>
