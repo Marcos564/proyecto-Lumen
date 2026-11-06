@@ -126,7 +126,7 @@ export function PatientsListPage() {
       <Table<Patient>
         data={filteredPatients}
         keyExtractor={(patient) => patient.id}
-        onRowClick={(patient) => navigate(`/pacientes/${patient.id}`)}
+        onRowClick={(patient) => navigate(`/pets/${patient.id}`)}
         emptyMessage={isLoading
           ? "Cargando pacientes..."
           : "No se encontraron pacientes."}

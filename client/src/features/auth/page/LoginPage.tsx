@@ -3,7 +3,7 @@ import { Card } from "../../../components/ui/Card";
 import { LoginForm, type LoginFormData } from "../components/LoginForm";
 import { UserProfileHeader } from "../components/UseProfileHeader";
 import { AuthStatusBadge } from "../components/AuthStatusBadge";
-import { useAuth } from "../../../shared";
+import { useAuth } from "../../../shared/";
 import { type SubmitHandler } from "react-hook-form";
 import type { SignInRequest } from "../types/authTypes";
 import { SignInSuccessMessage } from "../components/SignInSuccessMessage";
@@ -15,7 +15,7 @@ export function LoginPage(): JSX.Element {
 
   const handleLoginSuccess = () => {
     // Redirige a otra ruta
-    navigate("/pacientes");
+    navigate("/pets"); // Cambia "/dashboard" por la ruta a la que quieras redirigir
   };
   const onSubmit: SubmitHandler<LoginFormData> = async (data) => {
     const request: SignInRequest = {

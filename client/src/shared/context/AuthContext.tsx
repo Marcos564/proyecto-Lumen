@@ -1,7 +1,6 @@
 import {
   createContext,
   type ReactNode,
-  useContext,
   useEffect,
   useMemo,
   useState,
@@ -13,6 +12,7 @@ import {
   type User,
 } from "../../features/auth/index.ts";
 import { jwtDecode } from "jwt-decode";
+import { profileKey, tokenKey } from "../constant/localStorage.ts";
 interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
@@ -32,35 +32,35 @@ export interface JwtPayload {
   "aud": string;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+export const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   // 1. Estado del token crudo
   const [token, setTokenRaw] = useState<string | null>(() => {
-    return localStorage.getItem("token");
+    return localStorage.getItem(tokenKey);
   });
   const [user, setUserRaw] = useState<User | null>(() => {
-    const userData = localStorage.getItem("user");
+    const userData = localStorage.getItem(profileKey);
     return userData ? JSON.parse(userData) : null;
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return !!localStorage.getItem("token");
+    return !!localStorage.getItem(tokenKey) && !!localStorage.getItem(profileKey);
   });
   const setUser = (newUser: User | null) => {
     if (newUser) {
-      localStorage.setItem("user", JSON.stringify(newUser));
+      localStorage.setItem(profileKey, JSON.stringify(newUser));
     } else {
-      localStorage.removeItem("user");
+      localStorage.removeItem(profileKey);
     }
     setUserRaw(newUser);
   };
   // 2. Función helper para actualizar el token en localStorage y estado
   const setToken = (newToken: string | null) => {
     if (newToken) {
-      localStorage.setItem("token", newToken);
+      localStorage.setItem(tokenKey, newToken);
     } else {
-      localStorage.removeItem("token");
+      localStorage.removeItem(tokenKey);
     }
     setTokenRaw(newToken);
   };
@@ -74,6 +74,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data: SignInResponse = await authService.signIn(credentials);
       if (data?.accessToken) {
         setToken(data.accessToken);
+        setUser(data.user);
+        setIsAuthenticated(true);
       }
       return data;
     } catch (error) {
@@ -97,7 +99,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const decoded = jwtDecode<JwtPayload>(token);
 
-      // Opcional: Validar si expiró el token
       const currentTime = Date.now() / 1000;
       if (decoded.exp < currentTime) {
         signOut();
@@ -112,9 +113,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [token]);
   // Cerrar sesion de forma automatica si el token es invalido o expirado
   useEffect(() => {
-  if (token && !jwtPayload) {
-    signOut();
-  }
+    if (token && !jwtPayload) {
+      signOut();
+    }
   }, [jwtPayload, token]);
   // 6. Memorizamos el valor del contexto para optimizar rendimiento
   const value = useMemo(
@@ -132,10 +133,3 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth debe ser usado dentro de un AuthProvider");
-  }
-  return context;
-}
