@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Button } from "../../components/ui/Button";
-import { Field, inputClass } from "../../components/ui/Field";
-import type { PatientInput } from "../../services/patients.service";
-import type { Owner } from "../../types";
-import { ownerFullName } from "../owners/ownerFullName";
+import { Button } from "../../../components/ui/Button";
+import { Field, inputClass } from "../../../components/ui/Field";
+import type { PatientInput } from "../../../services/patients.service";
+import type { Owner } from "../../../types";
+import { ownerFullName } from "../../owners/ownerFullName";
 
 interface PatientFormProps {
   owners: Owner[];
