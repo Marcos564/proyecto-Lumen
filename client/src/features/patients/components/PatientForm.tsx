@@ -4,11 +4,10 @@ import { Field, inputClass } from "../../../components/ui/Field";
 import type { PatientInput } from "../../../services/patients.service";
 import type { Owner } from "../../../types";
 import { ownerFullName } from "../../owners/ownerFullName";
-import { type Specie, type Breed, breedSpecies, species, speciesBreeds, breeds } from "../mock/breed";
+import { breeds, species } from "../mock/breed";
 
 interface PatientFormProps {
   owners: Owner[];
-  breeds: Specie[];
   initialValues?: PatientInput;
   submitting?: boolean;
   onSubmit: (values: PatientInput) => void;
@@ -27,7 +26,6 @@ export function PatientForm(
   { owners, initialValues = emptyValues, submitting, onSubmit }:
     PatientFormProps,
 ) {
-  const [specie, setSpecie] = useState<Specie | null>(null);
   const [values, setValues] = useState<PatientInput>(initialValues);
 
   function handleChange<K extends keyof PatientInput>(
@@ -60,8 +58,6 @@ export function PatientForm(
             value={values.species}
             onChange={(e) => {
               handleChange("species", e.target.value);
-              var specie: Specie | null = { name: e.target.value } as Specie;
-              setSpecie(specie);
             }}
             required
           >
@@ -85,7 +81,7 @@ export function PatientForm(
             <option value="" disabled>
               Seleccioná una raza
             </option>
-            {specie && breeds.map((breed) => (
+            {breeds.map((breed) => (
               <option key={breed.name} value={breed.name}>
                 {breed.name}
               </option>
