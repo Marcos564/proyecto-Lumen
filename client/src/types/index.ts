@@ -1,17 +1,3 @@
-export interface Treatment {
-  id: string;
-  name: string;
-  date: string;
-  notes?: string;
-}
-
-export interface Vaccine {
-  id: string;
-  name: string;
-  dateApplied: string;
-  nextDueDate?: string;
-}
-
 export interface Owner {
   id: string;
   firstName: string;
@@ -20,20 +6,6 @@ export interface Owner {
   address: string;
   phone: string;
   email?: string;
-}
-
-export type PatientStatus = "active" | "inactive";
-
-export interface Patient {
-  id: string;
-  name: string;
-  species: string;
-  breed: string;
-  birthDate?: string;
-  ownerId: string;
-  status: PatientStatus;
-  treatments: Treatment[];
-  vaccines: Vaccine[];
 }
 
 export interface Specialist {

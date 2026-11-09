@@ -13,7 +13,7 @@ import {
   Stethoscope,
   Users,
 } from "lucide-react";
-import { Link } from "../../components/ui/Link";
+import { Link } from "../../shared/components/ui/Link";
 
 // Fotos de ejemplo (Unsplash). Reemplazar por imágenes propias en /public cuando las haya.
 const IMAGES = {

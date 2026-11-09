@@ -1,23 +1,22 @@
 import { useState } from 'react'
-import { Button } from '../../components/ui/Button'
-import { Field, inputClass } from '../../components/ui/Field'
+import { Button } from '../../shared/components/ui/Button'
+import { Field, inputClass } from '../../shared/components/ui/Field'
 import type { AppointmentInput } from '../../services/appointments.service'
 import { isPastDateTime, nowDateTimeValue } from '../../services/dateTime'
-import type { AppointmentStatus, Owner, Patient } from '../../types'
-import { ownerFullName } from '../owners/ownerFullName'
+import type { AppointmentStatus } from '../../types'
+import type { PetSummary } from '../patients/types'
 
 interface AppointmentFormProps {
-  patients: Patient[]
-  owners: Owner[]
+  pets: PetSummary[]
   initialValues?: AppointmentInput
   error?: string
   submitting?: boolean
   onSubmit: (values: AppointmentInput) => void
 }
 
-function buildEmptyValues(patients: Patient[]): AppointmentInput {
+function buildEmptyValues(pets: PetSummary[]): AppointmentInput {
   return {
-    patientId: patients[0]?.id ?? "",
+    patientId: pets[0]?.id ?? "",
     date: "",
     reason: "",
     status: "scheduled",
@@ -29,10 +28,9 @@ const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'))
 const minutes = Array.from({ length: 12 }, (_, i) => String(i * 5).padStart(2, '0'))
 const lastMinute = minutes[minutes.length - 1]
 
-export function AppointmentForm({ patients, owners, initialValues, error, submitting, onSubmit }: AppointmentFormProps) {
-  const [values, setValues] = useState<AppointmentInput>(initialValues ?? buildEmptyValues(patients))
+export function AppointmentForm({ pets, initialValues, error, submitting, onSubmit }: AppointmentFormProps) {
+  const [values, setValues] = useState<AppointmentInput>(initialValues ?? buildEmptyValues(pets))
   const [pastDateError, setPastDateError] = useState('')
-  const ownersById = new Map(owners.map((owner) => [owner.id, owner]))
 
   // La fecha se guarda como "YYYY-MM-DDTHH:mm" (24 h); se edita en partes para no depender del formato AM/PM del navegador.
   const [datePart = "", timePart = ""] = values.date.split("T");
@@ -82,14 +80,11 @@ export function AppointmentForm({ patients, owners, initialValues, error, submit
             onChange={(e) => handleChange("patientId", e.target.value)}
             required
           >
-            {patients.map((patient) => {
-              const owner = ownersById.get(patient.ownerId);
-              return (
-                <option key={patient.id} value={patient.id}>
-                  {patient.name} ({owner ? ownerFullName(owner) : "—"})
-                </option>
-              );
-            })}
+            {pets.map((pet) => (
+              <option key={pet.id} value={pet.id}>
+                {pet.name} · {pet.specie} {pet.race}
+              </option>
+            ))}
           </select>
         </Field>
         <Field label="Fecha">

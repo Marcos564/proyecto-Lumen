@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
-import { Badge } from "../../components/ui/Badge";
+import { Badge } from "../../shared/components/ui/Badge";
 import type { AppointmentStatus } from "../../types";
 import {
   appointmentStatuses,

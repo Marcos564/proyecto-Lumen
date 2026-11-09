@@ -1,31 +1,40 @@
 import { Pencil, Trash2 } from "lucide-react";
-import { Table } from "../../../components/ui/Table";
-import { IconButton } from "../../../components/ui/IconButton";
-import type { Owner, Patient } from "../../../types";
-import { ownerFullName } from "../../owners/ownerFullName";
-import { PatientStatusBadge } from "./PatientStatusBadge";
+import { Table } from "../../../shared/components/ui/Table";
+import { IconButton } from "../../../shared/components/ui/IconButton";
+import type { PetSummary } from "../types";
+import { PetStatusBadge } from "./PatientStatusBadge";
+
+// Edad compacta: "2 años y 3 meses", "3 meses", etc.
+function formatAge(pet: PetSummary): string {
+  const parts: string[] = [];
+  if (pet.years > 0) {
+    parts.push(`${pet.years} ${pet.years === 1 ? "año" : "años"}`);
+  }
+  if (pet.months > 0 || parts.length === 0) {
+    parts.push(`${pet.months} ${pet.months === 1 ? "mes" : "meses"}`);
+  }
+  return parts.join(" y ");
+}
 
 interface PatientsTableProps {
-  patients: Patient[];
-  ownersById: Map<string, Owner>;
+  pets: PetSummary[];
   isLoading: boolean;
-  onRowClick: (patient: Patient) => void;
-  onEdit: (patient: Patient) => void;
-  onDelete: (patient: Patient) => void;
+  onRowClick: (pet: PetSummary) => void;
+  onEdit: (pet: PetSummary) => void;
+  onDelete: (pet: PetSummary) => void;
 }
 
 export function PatientsTable(
-  { patients, ownersById, isLoading, onRowClick, onEdit, onDelete }:
-    PatientsTableProps,
+  { pets, isLoading, onRowClick, onEdit, onDelete }: PatientsTableProps,
 ) {
   return (
-    <Table<Patient>
-      data={patients}
-      keyExtractor={(patient) => patient.id}
+    <Table<PetSummary>
+      data={pets}
+      keyExtractor={(pet) => pet.id}
       onRowClick={onRowClick}
       emptyMessage={isLoading
-        ? "Cargando pacientes..."
-        : "No se encontraron pacientes."}
+        ? "Cargando mascotas..."
+        : "No se encontraron mascotas."}
       columns={[
         {
           header: "Mascota",
@@ -35,22 +44,15 @@ export function PatientsTable(
         },
         {
           header: "Especie / Raza",
-          render: (p) => `${p.species} · ${p.breed}`,
+          render: (p) => `${p.specie} · ${p.race}`,
         },
         {
-          header: "Responsable",
-          render: (p) => {
-            const owner = ownersById.get(p.ownerId);
-            return owner ? ownerFullName(owner) : "—";
-          },
-        },
-        {
-          header: "Contacto",
-          render: (p) => ownersById.get(p.ownerId)?.phone ?? "—",
+          header: "Edad",
+          render: (p) => formatAge(p),
         },
         {
           header: "Estado",
-          render: (p) => <PatientStatusBadge status={p.status} />,
+          render: (p) => <PetStatusBadge status={p.status} />,
         },
         {
           header: "",

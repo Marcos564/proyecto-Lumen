@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2 } from "lucide-react";
-import { Table } from "../../components/ui/Table";
-import { Button } from "../../components/ui/Button";
-import { IconButton } from "../../components/ui/IconButton";
-import { Modal } from "../../components/ui/Modal";
+import { Table } from "../../shared/components/ui/Table";
+import { Button } from "../../shared/components/ui/Button";
+import { IconButton } from "../../shared/components/ui/IconButton";
+import { Modal } from "../../shared/components/ui/Modal";
 import {
   type AppointmentInput,
   createAppointment,
@@ -13,8 +13,7 @@ import {
   updateAppointment,
   updateAppointmentStatus,
 } from "../../services/appointments.service";
-import { getPatients } from "../../services/patients.service";
-import { getOwners } from "../../services/owners.service";
+import { petService } from "../patients/services/petsService";
 import type { Appointment, AppointmentStatus } from "../../types";
 import { AppointmentForm } from "./AppointmentForm";
 import { AppointmentStatusPopover } from "./AppointmentStatusPopover";
@@ -30,18 +29,12 @@ export function AppointmentsPage() {
     queryKey: ["appointments"],
     queryFn: getAppointments,
   });
-  const { data: patients = [] } = useQuery({
-    queryKey: ["patients"],
-    queryFn: getPatients,
-  });
-  const { data: owners = [] } = useQuery({
-    queryKey: ["owners"],
-    queryFn: getOwners,
+  const { data: pets = [] } = useQuery({
+    queryKey: ["pets"],
+    queryFn: petService.getPets,
   });
 
-  const patientsById = useMemo(() => new Map(patients.map((p) => [p.id, p])), [
-    patients,
-  ]);
+  const petsById = useMemo(() => new Map(pets.map((p) => [p.id, p])), [pets]);
 
   const sortedAppointments = useMemo(
     () => [...appointments].sort((a, b) => a.date.localeCompare(b.date)),
@@ -100,7 +93,7 @@ export function AppointmentsPage() {
     }
   }
 
-  const canCreateAppointment = patients.length > 0
+  const canCreateAppointment = pets.length > 0
   const formError = (createMutation.error ?? updateMutation.error)?.message
 
   return (
@@ -142,7 +135,7 @@ export function AppointmentsPage() {
           },
           {
             header: "Paciente",
-            render: (a) => patientsById.get(a.patientId)?.name ?? "—",
+            render: (a) => petsById.get(a.patientId)?.name ?? "—",
           },
           { header: "Motivo", render: (a) => a.reason },
           {
@@ -185,8 +178,7 @@ export function AppointmentsPage() {
         onClose={() => setModalOpen(false)}
       >
         <AppointmentForm
-          patients={patients}
-          owners={owners}
+          pets={pets}
           initialValues={editingAppointment ?? undefined}
           error={formError}
           onSubmit={handleSubmit}

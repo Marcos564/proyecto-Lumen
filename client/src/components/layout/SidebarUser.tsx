@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronUp, LogIn, LogOut, User } from "lucide-react";
 import { useAuth } from "../../shared";
-import { Button } from "../ui/Button";
-import { Link } from "../ui/Link";
+import { Button } from "../../shared/components/ui/Button";
+import { Link } from "../../shared/components/ui/Link";
 
 export function SidebarUser() {
   const { isAuthenticated, signOut, jwtPayload, user } = useAuth();

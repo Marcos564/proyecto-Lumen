@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Button } from "../../components/ui/Button";
-import { Field, inputClass } from "../../components/ui/Field";
+import { Button } from "../../shared/components/ui/Button";
+import { Field, inputClass } from "../../shared/components/ui/Field";
 import type { OwnerInput } from "../../services/owners.service";
 
 interface OwnerFormProps {

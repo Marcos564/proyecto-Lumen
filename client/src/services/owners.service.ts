@@ -1,7 +1,6 @@
 import type { Owner } from "../types";
 import { ownersMock } from "./mock/owners.mock";
 import { delay } from "./mock/delay";
-import { countPatientsByOwner } from "./patients.service";
 
 let owners: Owner[] = [...ownersMock];
 
@@ -43,9 +42,11 @@ function validateOwner(data: OwnerInput, currentId?: string) {
   }
 }
 
-// La cantidad de mascotas no se guarda: se calcula a partir de los pacientes asignados.
+// La cantidad de mascotas ya no se calcula acá: las mascotas viven en el
+// backend y cada una se vincula al perfil del usuario autenticado, no a un
+// responsable de este mock. Se muestra 0 hasta que responsables conecte API.
 function withPetCount(owner: Owner): OwnerWithPets {
-  return { ...owner, petCount: countPatientsByOwner(owner.id) };
+  return { ...owner, petCount: 0 };
 }
 
 export function ownerExists(id: string): boolean {
@@ -91,10 +92,5 @@ export async function updateOwner(
 
 export async function deleteOwner(id: string): Promise<void> {
   await delay();
-  if (countPatientsByOwner(id) > 0) {
-    throw new Error(
-      "No se puede eliminar un responsable que tiene mascotas registradas.",
-    );
-  }
   owners = owners.filter((owner) => owner.id !== id);
 }

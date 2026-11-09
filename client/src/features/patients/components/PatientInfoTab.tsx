@@ -1,57 +1,66 @@
 import type { ReactNode } from "react";
-import { type LucideIcon, PawPrint, User } from "lucide-react";
-import { Card } from "../../../components/ui/Card";
-import type { OwnerWithPets } from "../../../services/owners.service";
-import type { Patient } from "../../../types";
-import { ownerFullName } from "../../owners/ownerFullName";
-import { PatientStatusBadge } from "./PatientStatusBadge";
+import { type LucideIcon, PawPrint, HeartPulse } from "lucide-react";
+import { Card } from "../../../shared/components/ui/Card";
+import type { Pet } from "../types";
+import { PetStatusBadge } from "./PatientStatusBadge";
 
 interface PatientInfoTabProps {
-  patient: Patient;
-  owner: OwnerWithPets | undefined;
+  patient: Pet;
 }
 
-export function PatientInfoTab({ patient, owner }: PatientInfoTabProps) {
+export function PatientInfoTab({ patient }: PatientInfoTabProps) {
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
       <Card className="flex flex-col gap-4">
         <SectionTitle icon={PawPrint} title="Mascota" />
         <div className="grid grid-cols-2 gap-4">
           <InfoRow label="Nombre" value={patient.name} />
-          <InfoRow label="Especie" value={patient.species} />
-          <InfoRow label="Raza" value={patient.breed} />
+          <InfoRow label="Especie" value={patient.specie} />
+          <InfoRow label="Raza" value={patient.race} />
           <InfoRow
             label="Fecha de nacimiento"
             value={patient.birthDate || "—"}
           />
           <InfoRow
-            label="Estado"
-            value={<PatientStatusBadge status={patient.status} />}
+            label="Edad"
+            value={formatAge(patient)}
           />
         </div>
       </Card>
 
       <Card className="flex flex-col gap-4">
-        <SectionTitle icon={User} title="Responsable" />
-        {owner
-          ? (
-            <div className="grid grid-cols-2 gap-4">
-              <InfoRow label="Nombre" value={ownerFullName(owner)} />
-              <InfoRow label="DNI" value={owner.dni} />
-              <InfoRow label="Teléfono" value={owner.phone} />
-              <InfoRow label="Email" value={owner.email || "—"} />
-              <InfoRow label="Dirección" value={owner.address} />
-              <InfoRow label="Mascotas registradas" value={owner.petCount} />
-            </div>
-          )
-          : (
-            <p className="text-sm text-slate-400">
-              Cargando datos del responsable...
-            </p>
-          )}
+        <SectionTitle icon={HeartPulse} title="Estado" />
+        <div className="grid grid-cols-2 gap-4">
+          <InfoRow
+            label="Estado"
+            value={<PetStatusBadge status={patient.status} />}
+          />
+          <InfoRow
+            label="Sexo"
+            value={genderLabel[patient.gender] ?? patient.gender}
+          />
+        </div>
       </Card>
     </div>
   );
+}
+
+const genderLabel: Record<string, string> = {
+  Male: "Macho",
+  Female: "Hembra",
+  Other: "Otro",
+};
+
+// Edad compacta a partir del cálculo que ya devuelve el backend.
+function formatAge(pet: Pet): string {
+  const parts: string[] = [];
+  if (pet.years > 0) {
+    parts.push(`${pet.years} ${pet.years === 1 ? "año" : "años"}`);
+  }
+  if (pet.months > 0 || parts.length === 0) {
+    parts.push(`${pet.months} ${pet.months === 1 ? "mes" : "meses"}`);
+  }
+  return parts.join(" y ");
 }
 
 function SectionTitle(

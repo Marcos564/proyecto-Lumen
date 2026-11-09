@@ -1,30 +1,28 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { Tabs } from "../../components/ui/Tabs";
-import type { Treatment, Vaccine } from "../../types";
-import { ownerFullName } from "../owners/ownerFullName";
-import { useOwner } from "../owners/hooks/useOwners";
-import { usePatient } from "./hooks/usePatients";
+import { Tabs } from "../../shared/components/ui/Tabs";
+import { usePet, useMedicalRecords } from "./hooks/usePets";
 import { PatientInfoTab } from "./components/PatientInfoTab";
 import { HistoryTable } from "./components/HistoryTable";
+import type { MedicalRecord } from "./types";
 
 const tabs = [
   { id: "info", label: "Info general" },
-  { id: "treatments", label: "Tratamientos" },
-  { id: "vaccines", label: "Vacunas" },
+  { id: "medical-records", label: "Historia clínica" },
 ];
 
 export function PatientDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState("info");
-  const { data: patient, isLoading } = usePatient(id);
-  const { data: owner } = useOwner(patient?.ownerId);
+  const { data: patient, isLoading } = usePet(id);
+  const { data: medicalRecords = [], isLoading: isLoadingRecords } =
+    useMedicalRecords(patient?.id);
 
   if (isLoading) {
     return <p className="text-sm text-slate-500">Cargando ficha...</p>;
   }
   if (!patient) {
-    return <p className="text-sm text-slate-500">Paciente no encontrado.</p>;
+    return <p className="text-sm text-slate-500">Mascota no encontrada.</p>;
   }
 
   return (
@@ -34,35 +32,30 @@ export function PatientDetailPage() {
           {patient.name}
         </h1>
         <p className="text-sm text-slate-500">
-          {patient.species} · {patient.breed} · Responsable:{" "}
-          {owner ? ownerFullName(owner) : "—"}
+          {patient.specie} · {patient.race}
         </p>
       </div>
 
       <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
-      {activeTab === "info" && <PatientInfoTab patient={patient} owner={owner} />}
+      {activeTab === "info" && <PatientInfoTab patient={patient} />}
 
-      {activeTab === "treatments" && (
-        <HistoryTable<Treatment>
-          rows={patient.treatments}
-          emptyMessage="Sin tratamientos registrados."
+      {activeTab === "medical-records" && (
+        <HistoryTable<MedicalRecord>
+          rows={medicalRecords}
+          emptyMessage={isLoadingRecords
+            ? "Cargando historia clínica..."
+            : "No hay registros de historia clínica."}
           columns={[
-            { header: "Tratamiento", render: (t) => t.name },
-            { header: "Fecha", render: (t) => t.date },
-            { header: "Notas", render: (t) => t.notes || "—" },
-          ]}
-        />
-      )}
-
-      {activeTab === "vaccines" && (
-        <HistoryTable<Vaccine>
-          rows={patient.vaccines}
-          emptyMessage="Sin vacunas registradas."
-          columns={[
-            { header: "Vacuna", render: (v) => v.name },
-            { header: "Aplicada", render: (v) => v.dateApplied },
-            { header: "Próxima dosis", render: (v) => v.nextDueDate || "—" },
+            { header: "Registro", render: (r) => r.title },
+            {
+              header: "Temperatura",
+              render: (r) => `${r.temperature} °C`,
+            },
+            {
+              header: "Peso",
+              render: (r) => `${r.weight} kg`,
+            },
           ]}
         />
       )}

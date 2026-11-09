@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2 } from "lucide-react";
-import { Table } from "../../components/ui/Table";
-import { SearchInput } from "../../components/ui/SearchInput";
-import { Button } from "../../components/ui/Button";
-import { IconButton } from "../../components/ui/IconButton";
-import { Badge } from "../../components/ui/Badge";
-import { Modal } from "../../components/ui/Modal";
+import { Table } from "../../shared/components/ui/Table";
+import { SearchInput } from "../../shared/components/ui/SearchInput";
+import { Button } from "../../shared/components/ui/Button";
+import { IconButton } from "../../shared/components/ui/IconButton";
+import { Badge } from "../../shared/components/ui/Badge";
+import { Modal } from "../../shared/components/ui/Modal";
 import {
   createInventoryItem,
   deleteInventoryItem,

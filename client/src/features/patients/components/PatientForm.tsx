@@ -1,38 +1,82 @@
-import { useState } from "react";
-import { Button } from "../../../components/ui/Button";
-import { Field, inputClass } from "../../../components/ui/Field";
-import type { PatientInput } from "../../../services/patients.service";
-import type { Owner } from "../../../types";
-import { ownerFullName } from "../../owners/ownerFullName";
-import { breeds, species } from "../mock/breed";
+import { useMemo, useState } from "react";
+import { Button } from "../../../shared/components/ui/Button";
+import { Field, inputClass } from "../../../shared/components/ui/Field";
+import type { PetGender, PetInput, PetStatus, Race, Specie } from "../types";
 
 interface PatientFormProps {
-  owners: Owner[];
-  initialValues?: PatientInput;
+  species: Specie[];
+  races: Race[];
+  initialValues?: PetInput;
   submitting?: boolean;
-  onSubmit: (values: PatientInput) => void;
+  // En edición la API solo acepta nombre y estado (PUT /pets/{id}).
+  isEditing?: boolean;
+  onSubmit: (values: PetInput) => void;
 }
 
-const emptyValues: PatientInput = {
+const genderLabel: Record<PetGender, string> = {
+  Male: "Macho",
+  Female: "Hembra",
+  Other: "Otro",
+};
+
+const statusLabel: Record<PetStatus, string> = {
+  Alive: "Vivo",
+  Dead: "Fallecido",
+  Entreatment: "En tratamiento",
+  Adopted: "Adoptado",
+  Lost: "Perdido",
+  Unknown: "Desconocido",
+};
+
+const defaultValues: PetInput = {
   name: "",
-  species: "",
-  breed: "",
   birthDate: "",
-  ownerId: "",
-  status: "active",
+  status: "Alive",
+  raceId: "",
+  gender: "Male",
 };
 
 export function PatientForm(
-  { owners, initialValues = emptyValues, submitting, onSubmit }:
-    PatientFormProps,
+  {
+    species,
+    races,
+    initialValues,
+    submitting,
+    isEditing = false,
+    onSubmit,
+  }: PatientFormProps,
 ) {
-  const [values, setValues] = useState<PatientInput>(initialValues);
+  const [values, setValues] = useState<PetInput>(
+    initialValues ?? defaultValues,
+  );
 
-  function handleChange<K extends keyof PatientInput>(
+  // La especie se elige primero; las razas se filtran por ella.
+  // En edición se deduce de la raza que ya tiene la mascota.
+  const raceById = useMemo(
+    () => new Map(races.map((race) => [race.id, race])),
+    [races],
+  );
+  const [selectedSpecieId, setSelectedSpecieId] = useState(
+    () => (initialValues
+      ? raceById.get(initialValues.raceId)?.specieId ?? ""
+      : ""),
+  );
+  const racesOfSpecie = useMemo(
+    () => races.filter((race) => race.specieId === selectedSpecieId),
+    [races, selectedSpecieId],
+  );
+
+  function handleChange<K extends keyof PetInput>(
     field: K,
-    value: PatientInput[K],
+    value: PetInput[K],
   ) {
     setValues((prev) => ({ ...prev, [field]: value }));
+  }
+
+  function handleSpecieChange(specieId: string) {
+    setSelectedSpecieId(specieId);
+    // La raza elegida anteriormente ya no corresponde a la nueva especie.
+    setValues((prev) => ({ ...prev, raceId: "" }));
   }
 
   return (
@@ -53,19 +97,18 @@ export function PatientForm(
           />
         </Field>
         <Field label="Especie">
-           <select
+          <select
             className={inputClass}
-            value={values.species}
-            onChange={(e) => {
-              handleChange("species", e.target.value);
-            }}
-            required
+            value={selectedSpecieId}
+            disabled={isEditing}
+            onChange={(e) => handleSpecieChange(e.target.value)}
+            required={!isEditing}
           >
             <option value="" disabled>
               Seleccioná una especie
             </option>
             {species.map((specie) => (
-              <option key={specie.name} value={specie.name}>
+              <option key={specie.id} value={specie.id}>
                 {specie.name}
               </option>
             ))}
@@ -74,16 +117,19 @@ export function PatientForm(
         <Field label="Raza">
           <select
             className={inputClass}
-            value={values.breed}
-            onChange={(e) => handleChange("breed", e.target.value)}
-            required
+            value={values.raceId}
+            disabled={isEditing}
+            onChange={(e) => handleChange("raceId", e.target.value)}
+            required={!isEditing}
           >
             <option value="" disabled>
-              Seleccioná una raza
+              {selectedSpecieId
+                ? "Seleccioná una raza"
+                : "Elegí una especie primero"}
             </option>
-            {breeds.map((breed) => (
-              <option key={breed.name} value={breed.name}>
-                {breed.name}
+            {racesOfSpecie.map((race) => (
+              <option key={race.id} value={race.id}>
+                {race.name}
               </option>
             ))}
           </select>
@@ -93,22 +139,26 @@ export function PatientForm(
             type="date"
             className={inputClass}
             value={values.birthDate}
+            disabled={isEditing}
             onChange={(e) => handleChange("birthDate", e.target.value)}
+            required={!isEditing}
           />
         </Field>
-        <Field label="Responsable">
+        <Field label="Sexo">
           <select
             className={inputClass}
-            value={values.ownerId}
-            onChange={(e) => handleChange("ownerId", e.target.value)}
-            required
+            value={values.gender}
+            disabled={isEditing}
+            onChange={(e) =>
+              handleChange("gender", e.target.value as PetGender)}
+            required={!isEditing}
           >
             <option value="" disabled>
-              Seleccioná un responsable
+              Seleccioná el sexo
             </option>
-            {owners.map((owner) => (
-              <option key={owner.id} value={owner.id}>
-                {ownerFullName(owner)} · DNI {owner.dni}
+            {(Object.keys(genderLabel) as PetGender[]).map((gender) => (
+              <option key={gender} value={gender}>
+                {genderLabel[gender]}
               </option>
             ))}
           </select>
@@ -117,14 +167,22 @@ export function PatientForm(
           <select
             className={inputClass}
             value={values.status}
-            onChange={(e) =>
-              handleChange("status", e.target.value as PatientInput["status"])}
+            onChange={(e) => handleChange("status", e.target.value as PetStatus)}
           >
-            <option value="active">Activo</option>
-            <option value="inactive">Inactivo</option>
+            {(Object.keys(statusLabel) as PetStatus[]).map((status) => (
+              <option key={status} value={status}>
+                {statusLabel[status]}
+              </option>
+            ))}
           </select>
         </Field>
       </div>
+      {isEditing && (
+        <p className="text-xs text-slate-400">
+          Al editar una mascota existente solo se actualizan el nombre y el
+          estado.
+        </p>
+      )}
       <div className="flex justify-end gap-2 pt-2">
         <Button type="submit" disabled={submitting}>
           {submitting ? "Guardando..." : "Guardar"}
