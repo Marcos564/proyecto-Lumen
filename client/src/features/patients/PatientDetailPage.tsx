@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { Tabs } from "../../shared/components/ui/Tabs";
+import { Tabs } from "@shared/components/ui/Tabs";
 import { usePet, useMedicalRecords } from "./hooks/usePets";
 import { PatientInfoTab } from "./components/PatientInfoTab";
 import { HistoryTable } from "./components/HistoryTable";
-import type { MedicalRecord } from "./types";
+import type { MedicalRecord } from "@shared/types/pets";
 
 const tabs = [
   { id: "info", label: "Info general" },

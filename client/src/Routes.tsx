@@ -1,11 +1,11 @@
 import { lazy, Suspense } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { AppLayout } from "./layouts/AppLayout";
-import { FallbackLoading } from "./shared/components/FallbackLoading";
-import AuthLayout from "./layouts/AuthLayout";
-import { useAuth } from "./shared";
+import { AppLayout } from "@layouts/AppLayout";
+import { FallbackLoading } from "@shared/components/FallbackLoading";
+import AuthLayout from "@layouts/AuthLayout";
+import { useAuth } from "@shared";
 const PatientsListPage = lazy(() =>
-  import("./features/patients/PatientsListPage").then((module) => ({
+  import("@features/patients/PatientsListPage").then((module) => ({
     default: module.PatientsListPage,
   })).catch((error) => {
     console.error("Error loading PatientsListPage:", error);
@@ -13,7 +13,7 @@ const PatientsListPage = lazy(() =>
   })
 );
 const PatientDetailPage = lazy(() =>
-  import("./features/patients/PatientDetailPage").then((module) => ({
+  import("@features/patients/PatientDetailPage").then((module) => ({
     default: module.PatientDetailPage,
   })).catch((error) => {
     console.error("Error loading PatientDetailPage:", error);
@@ -21,7 +21,7 @@ const PatientDetailPage = lazy(() =>
   })
 );
 const SpecialistsListPage = lazy(() =>
-  import("./features/specialists/SpecialistsListPage").then((module) => ({
+  import("@features/specialists/SpecialistsListPage").then((module) => ({
     default: module.SpecialistsListPage,
   })).catch((error) => {
     console.error("Error loading SpecialistsListPage:", error);
@@ -29,7 +29,7 @@ const SpecialistsListPage = lazy(() =>
   })
 );
 const AppointmentsPage = lazy(() =>
-  import("./features/appointments/AppointmentsPage").then((module) => ({
+  import("@features/appointments/AppointmentsPage").then((module) => ({
     default: module.AppointmentsPage,
   })).catch((error) => {
     console.error("Error loading AppointmentsPage:", error);
@@ -37,7 +37,7 @@ const AppointmentsPage = lazy(() =>
   })
 );
 const InventoryPage = lazy(() =>
-  import("./features/inventory/InventoryPage").then((module) => ({
+  import("@features/inventory/InventoryPage").then((module) => ({
     default: module.InventoryPage,
   })).catch((error) => {
     console.error("Error loading InventoryPage:", error);
@@ -45,7 +45,7 @@ const InventoryPage = lazy(() =>
   })
 );
 const OwnersListPage = lazy(() =>
-  import("./features/owners/OwnersListPage").then((module) => ({
+  import("@features/owners/OwnersListPage").then((module) => ({
     default: module.OwnersListPage,
   })).catch((error) => {
     console.error("Error loading OwnersListPage:", error);
@@ -53,7 +53,7 @@ const OwnersListPage = lazy(() =>
   })
 );
 const LoginPage = lazy(() =>
-  import("./features/auth/page/LoginPage").then((module) => ({
+  import("@features/auth/page/LoginPage").then((module) => ({
     default: module.LoginPage,
   })).catch((error) => {
     console.error("Error loading LoginPage:", error);
@@ -61,7 +61,7 @@ const LoginPage = lazy(() =>
   })
 );
 const ComponenteInfinito = lazy(() =>
-  import("./shared/components/FallbackActive").then((module) => ({
+  import("@shared/components/FallbackActive").then((module) => ({
     default: module.ComponenteInfinito,
   })).catch((error) => {
     console.error("Error loading OwnersListPage:", error);
@@ -69,7 +69,7 @@ const ComponenteInfinito = lazy(() =>
   })
 );
 const LandingPage = lazy(() =>
-  import("./features/landing/LandingPage").then((module) => ({
+  import("@features/landing/LandingPage").then((module) => ({
     default: module.LandingPage,
   })).catch((error) => {
     console.error("Error loading LandingPage:", error);

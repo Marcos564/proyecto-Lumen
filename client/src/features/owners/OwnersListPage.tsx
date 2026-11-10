@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2 } from "lucide-react";
-import { Table } from "../../shared/components/ui/Table";
-import { SearchInput } from "../../shared/components/ui/SearchInput";
-import { Button } from "../../shared/components/ui/Button";
-import { IconButton } from "../../shared/components/ui/IconButton";
-import { Modal } from "../../shared/components/ui/Modal";
+import { Table } from "@shared/components/ui/Table";
+import { SearchInput } from "@shared/components/ui/SearchInput";
+import { Button } from "@shared/components/ui/Button";
+import { IconButton } from "@shared/components/ui/IconButton";
+import { Modal } from "@shared/components/ui/Modal";
 import {
   createOwner,
   deleteOwner,
@@ -13,7 +13,7 @@ import {
   type OwnerInput,
   type OwnerWithPets,
   updateOwner,
-} from "../../services/owners.service";
+} from "@shared/services/owners.service";
 import { OwnerForm } from "./OwnerForm";
 import { ownerFullName } from "./ownerFullName";
 

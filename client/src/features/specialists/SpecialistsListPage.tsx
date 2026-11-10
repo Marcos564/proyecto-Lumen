@@ -1,20 +1,20 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2 } from "lucide-react";
-import { Table } from "../../shared/components/ui/Table";
-import { SearchInput } from "../../shared/components/ui/SearchInput";
-import { Button } from "../../shared/components/ui/Button";
-import { IconButton } from "../../shared/components/ui/IconButton";
-import { Badge } from "../../shared/components/ui/Badge";
-import { Modal } from "../../shared/components/ui/Modal";
+import { Table } from "@shared/components/ui/Table";
+import { SearchInput } from "@shared/components/ui/SearchInput";
+import { Button } from "@shared/components/ui/Button";
+import { IconButton } from "@shared/components/ui/IconButton";
+import { Badge } from "@shared/components/ui/Badge";
+import { Modal } from "@shared/components/ui/Modal";
 import {
   createSpecialist,
   deleteSpecialist,
   getSpecialists,
   type SpecialistInput,
   updateSpecialist,
-} from "../../services/specialists.service";
-import type { Specialist } from "../../types";
+} from "@shared/services/specialists.service";
+import type { Specialist } from "@shared/types";
 import { SpecialistForm } from "./SpecialistForm";
 
 export function SpecialistsListPage() {

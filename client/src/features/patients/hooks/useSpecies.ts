@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { petService } from "../services/petsService";
+import { petService } from "@shared/services/pets.service";
 
 // Catálogos para el formulario de mascotas: especies y razas vienen del backend.
 export function useSpecies() {

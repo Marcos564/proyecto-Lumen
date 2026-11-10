@@ -7,7 +7,7 @@ import {
   Users,
 } from "lucide-react";
 import { Outlet } from "react-router-dom";
-import { Link } from "../shared/components/ui/Link";
+import { Link } from "@shared/components/ui/Link";
 
 // Misma foto que el hero de la landing.
 const HERO_IMAGE =

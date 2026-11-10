@@ -1,4 +1,4 @@
-import { instance } from "../../../shared/index";
+import { instance } from "../api/axiosInstance";
 import type {
   MedicalRecord,
   Pet,
@@ -7,7 +7,7 @@ import type {
   PetUpdateInput,
   Race,
   Specie,
-} from "../types";
+} from "../types/pets";
 
 /*
  * Acceso HTTP a mascotas del backend LumenBackend (C# / ASP.NET Core).

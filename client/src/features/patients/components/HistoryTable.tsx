@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Card } from "../../../shared/components/ui/Card";
+import { Card } from "@shared/components/ui/Card";
 
 interface HistoryColumn<T> {
   header: string;

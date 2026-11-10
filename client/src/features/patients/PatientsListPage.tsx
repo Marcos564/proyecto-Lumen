@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
-import { SearchInput } from "../../shared/components/ui/SearchInput";
-import { Button } from "../../shared/components/ui/Button";
-import { Modal } from "../../shared/components/ui/Modal";
+import { SearchInput } from "@shared/components/ui/SearchInput";
+import { Button } from "@shared/components/ui/Button";
+import { Modal } from "@shared/components/ui/Modal";
 import { useSpecies, useRaces } from "./hooks/useSpecies";
 import { useDeletePet, usePets } from "./hooks/usePets";
 import { usePetSearch } from "./hooks/usePetSearch";

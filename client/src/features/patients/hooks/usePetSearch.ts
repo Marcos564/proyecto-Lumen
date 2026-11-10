@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import type { PetSummary } from "../types";
+import type { PetSummary } from "@shared/types/pets";
 
 // Filtra por nombre de la mascota, especie o raza. El backend no asocia la
 // mascota con un responsable, así que ya no se filtra por dueño.

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { type LucideIcon, PawPrint, HeartPulse } from "lucide-react";
-import { Card } from "../../../shared/components/ui/Card";
-import type { Pet } from "../types";
+import { Card } from "@shared/components/ui/Card";
+import type { Pet } from "@shared/types/pets";
 import { PetStatusBadge } from "./PatientStatusBadge";
 
 interface PatientInfoTabProps {

@@ -1,7 +1,7 @@
 import { Pencil, Trash2 } from "lucide-react";
-import { Table } from "../../../shared/components/ui/Table";
-import { IconButton } from "../../../shared/components/ui/IconButton";
-import type { PetSummary } from "../types";
+import { Table } from "@shared/components/ui/Table";
+import { IconButton } from "@shared/components/ui/IconButton";
+import type { PetSummary } from "@shared/types/pets";
 import { PetStatusBadge } from "./PatientStatusBadge";
 
 // Edad compacta: "2 años y 3 meses", "3 meses", etc.

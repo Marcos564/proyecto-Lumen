@@ -1,13 +1,13 @@
 import type { JSX } from "react";
-import { Card } from "../../../shared/components/ui/Card";
+import { Card } from "@shared/components/ui/Card";
 import { LoginForm, type LoginFormData } from "../components/LoginForm";
 import { UserProfileHeader } from "../components/UseProfileHeader";
 import { AuthStatusBadge } from "../components/AuthStatusBadge";
-import { useAuth } from "../../../shared/";
+import { useAuth } from "@shared";
 import { type SubmitHandler } from "react-hook-form";
-import type { SignInRequest } from "../types/authTypes";
+import type { SignInRequest } from "@shared/types/auth";
 import { SignInSuccessMessage } from "../components/SignInSuccessMessage";
-import { Button } from "../../../shared/components/ui/Button";
+import { Button } from "@shared/components/ui/Button";
 import { useNavigate } from "react-router-dom";
 export function LoginPage(): JSX.Element {
   const { signIn, isAuthenticated, signOut } = useAuth();

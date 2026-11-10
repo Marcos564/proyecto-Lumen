@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Pet, PetInput, PetUpdateInput } from "../types";
+import type { Pet, PetInput, PetUpdateInput } from "@shared/types/pets";
 import { useCreatePet, usePet, useUpdatePet } from "./usePets";
 
 /*

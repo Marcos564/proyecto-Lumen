@@ -1,20 +1,20 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2 } from "lucide-react";
-import { Table } from "../../shared/components/ui/Table";
-import { SearchInput } from "../../shared/components/ui/SearchInput";
-import { Button } from "../../shared/components/ui/Button";
-import { IconButton } from "../../shared/components/ui/IconButton";
-import { Badge } from "../../shared/components/ui/Badge";
-import { Modal } from "../../shared/components/ui/Modal";
+import { Table } from "@shared/components/ui/Table";
+import { SearchInput } from "@shared/components/ui/SearchInput";
+import { Button } from "@shared/components/ui/Button";
+import { IconButton } from "@shared/components/ui/IconButton";
+import { Badge } from "@shared/components/ui/Badge";
+import { Modal } from "@shared/components/ui/Modal";
 import {
   createInventoryItem,
   deleteInventoryItem,
   getInventoryItems,
   type InventoryItemInput,
   updateInventoryItem,
-} from "../../services/inventory.service";
-import type { InventoryCategory, InventoryItem } from "../../types";
+} from "@shared/services/inventory.service";
+import type { InventoryCategory, InventoryItem } from "@shared/types";
 import { InventoryItemForm } from "./InventoryItemForm";
 
 const categoryLabels: Record<InventoryCategory, string> = {

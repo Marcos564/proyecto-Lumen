@@ -5,12 +5,8 @@ import {
   useMemo,
   useState,
 } from "react";
-import {
-  authService,
-  type SignInRequest,
-  type SignInResponse,
-  type User,
-} from "../../features/auth/index.ts";
+import { authService } from "../services/auth.service.ts";
+import type { SignInRequest, SignInResponse, User } from "../types/auth.ts";
 import { jwtDecode } from "jwt-decode";
 import { profileKey, tokenKey } from "../constant/localStorage.ts";
 interface AuthContextType {

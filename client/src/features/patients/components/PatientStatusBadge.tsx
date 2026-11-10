@@ -1,5 +1,5 @@
-import { Badge } from "../../../shared/components/ui/Badge";
-import type { PetStatus } from "../types";
+import { Badge } from "@shared/components/ui/Badge";
+import type { PetStatus } from "@shared/types/pets";
 
 // Estados que expone el enum Status del backend.
 const statusLabel: Record<PetStatus, string> = {

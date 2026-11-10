@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2 } from "lucide-react";
-import { Table } from "../../shared/components/ui/Table";
-import { Button } from "../../shared/components/ui/Button";
-import { IconButton } from "../../shared/components/ui/IconButton";
-import { Modal } from "../../shared/components/ui/Modal";
+import { Table } from "@shared/components/ui/Table";
+import { Button } from "@shared/components/ui/Button";
+import { IconButton } from "@shared/components/ui/IconButton";
+import { Modal } from "@shared/components/ui/Modal";
 import {
   type AppointmentInput,
   createAppointment,
@@ -12,9 +12,9 @@ import {
   getAppointments,
   updateAppointment,
   updateAppointmentStatus,
-} from "../../services/appointments.service";
-import { petService } from "../patients/services/petsService";
-import type { Appointment, AppointmentStatus } from "../../types";
+} from "@shared/services/appointments.service";
+import { petService } from "@shared/services/pets.service";
+import type { Appointment, AppointmentStatus } from "@shared/types";
 import { AppointmentForm } from "./AppointmentForm";
 import { AppointmentStatusPopover } from "./AppointmentStatusPopover";
 

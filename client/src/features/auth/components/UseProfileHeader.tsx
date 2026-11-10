@@ -1,5 +1,5 @@
 import { User } from "lucide-react";
-import { useAuth } from "../../../shared";
+import { useAuth } from "@shared";
 export const UserProfileHeader = () => {
   const { isAuthenticated, user } = useAuth();
 

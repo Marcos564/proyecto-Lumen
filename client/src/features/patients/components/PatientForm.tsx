@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
-import { Button } from "../../../shared/components/ui/Button";
-import { Field, inputClass } from "../../../shared/components/ui/Field";
-import type { PetGender, PetInput, PetStatus, Race, Specie } from "../types";
+import { Button } from "@shared/components/ui/Button";
+import { Field, inputClass } from "@shared/components/ui/Field";
+import type { PetGender, PetInput, PetStatus, Race, Specie } from "@shared/types/pets";
 
 interface PatientFormProps {
   species: Specie[];

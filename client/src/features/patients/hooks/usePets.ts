@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { petService } from "../services/petsService";
-import type { PetInput, PetUpdateInput } from "../types";
+import { petService } from "@shared/services/pets.service";
+import type { PetInput, PetUpdateInput } from "@shared/types/pets";
 
 /*
  * Acceso a datos de mascotas. Los componentes solo usan estos hooks, nunca

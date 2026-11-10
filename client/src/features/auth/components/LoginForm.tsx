@@ -1,7 +1,7 @@
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useState } from "react";
-import { useAuth } from "../../../shared";
-import { Button } from "../../../shared/components/ui/Button";
+import { useAuth } from "@shared";
+import { Button } from "@shared/components/ui/Button";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"; // Asegúrate de tener este paquete instalado
 import z from "zod";

@@ -1,9 +1,9 @@
-import { instance } from "../../../shared/index.ts";
+import { instance } from "../api/axiosInstance";
 import {
   type SignInRequest,
   type SignInResponse,
   type SignUpRequest,
-} from "../index.ts";
+} from "../types/auth";
 export const authService = {
   signIn: async (data: SignInRequest): Promise<SignInResponse> => {
     try {
