@@ -1,4 +1,5 @@
 import axios, { type InternalAxiosRequestConfig } from "axios";
+import { jwtDecode } from "jwt-decode";
 import { getConfig, profileKey, tokenKey } from "../index.ts";
 
 /*
@@ -51,6 +52,23 @@ function isAuthEndpoint(url?: string): boolean {
   return Boolean(url && /\/auth\//i.test(url));
 }
 
+/**
+ * Indica si un JWT ya venció (o no se puede decodificar).
+ *
+ * Un 401 con un token todavía vigente suele ser un problema de configuración
+ * del backend (por ejemplo, el esquema de autenticación), no una sesión
+ * vencida. En ese caso no cerramos sesión para no expulsar al usuario.
+ */
+function isTokenExpired(token: string): boolean {
+  try {
+    const { exp } = jwtDecode<{ exp?: number }>(token);
+    if (!exp) return false;
+    return exp * 1000 <= Date.now();
+  } catch {
+    return true;
+  }
+}
+
 instance.interceptors.request.use(async (config) => {
   const envConfig = await getConfig();
   config.baseURL = `${envConfig.getUrl()}/api/`;
@@ -82,6 +100,16 @@ instance.interceptors.response.use(
     const requestUrl: string | undefined = error.config?.url;
 
     if (status === 401 && !isAuthEndpoint(requestUrl)) {
+      const storedToken = getStoredToken();
+
+      // Sin token no hay sesión que cerrar.
+      // Con token vigente, un 401 no debe expulsar al usuario: puede ser un
+      // problema transitorio o de configuración del backend (y es justo lo
+      // que provocaba que al recargar la página se cerrara la sesión).
+      if (!storedToken || !isTokenExpired(storedToken)) {
+        return Promise.reject(error);
+      }
+
       clearSession();
 
       if (

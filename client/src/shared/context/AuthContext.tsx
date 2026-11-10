@@ -37,13 +37,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
   const [user, setUserRaw] = useState<User | null>(() => {
     const userData = localStorage.getItem(profileKey);
-    return userData ? JSON.parse(userData) : null;
+    if (!userData) return null;
+    try {
+      return JSON.parse(userData) as User;
+    } catch {
+      // Perfil corrupto: lo descartamos en vez de romper el arranque.
+      localStorage.removeItem(profileKey);
+      return null;
+    }
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    // La sesión depende del token válido, no del perfil: el perfil es solo
+    // informativo y su ausencia no debe expulsar al usuario al recargar.
     const storedToken = localStorage.getItem(tokenKey);
-    const storedProfile = localStorage.getItem(profileKey);
-    if (!storedToken || !storedProfile) return false;
+    if (!storedToken) return false;
     try {
       // Validamos expiración desde el inicio para no mostrar rutas privadas
       // con un token vencido y luego expulsar al usuario.
@@ -80,7 +88,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data: SignInResponse = await authService.signIn(credentials);
       if (data?.accessToken) {
         setToken(data.accessToken);
-        setUser(data.user);
+        // El backend devuelve `profile`; soportamos `user` por compatibilidad.
+        setUser(data.profile ?? data.user ?? null);
         setIsAuthenticated(true);
       }
       return data;
