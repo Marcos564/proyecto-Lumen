@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { AppLayout } from "@layouts/AppLayout";
 import { FallbackLoading } from "@shared/components/FallbackLoading";
+import { RequireAuth } from "@shared/components/RequireAuth";
 import AuthLayout from "@layouts/AuthLayout";
 import { useAuth } from "@shared";
 const PatientsListPage = lazy(() =>
@@ -100,10 +101,15 @@ export const Routes = createBrowserRouter([
   },
   {
     path: "/",
-    element: <AppLayout />,
+    element: (
+      <RequireAuth>
+        <AppLayout />
+      </RequireAuth>
+    ),
     children: [
       {
         index: true,
+        element: <Navigate to="/pets" replace />,
       },
       {
         path: "pets",

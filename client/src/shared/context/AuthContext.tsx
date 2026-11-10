@@ -41,7 +41,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return !!localStorage.getItem(tokenKey) && !!localStorage.getItem(profileKey);
+    const storedToken = localStorage.getItem(tokenKey);
+    const storedProfile = localStorage.getItem(profileKey);
+    if (!storedToken || !storedProfile) return false;
+    try {
+      // Validamos expiración desde el inicio para no mostrar rutas privadas
+      // con un token vencido y luego expulsar al usuario.
+      const decoded = jwtDecode<JwtPayload>(storedToken);
+      return decoded.exp * 1000 > Date.now();
+    } catch {
+      return false;
+    }
   });
   const setUser = (newUser: User | null) => {
     if (newUser) {
@@ -97,13 +107,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const currentTime = Date.now() / 1000;
       if (decoded.exp < currentTime) {
-        signOut();
         return null;
       }
       return decoded;
     } catch (error) {
       console.error("Token inválido", error);
-      signOut();
       return null;
     }
   }, [token]);
@@ -123,7 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       jwtPayload,
     }),
-    [isLoading, isAuthenticated, jwtPayload],
+    [isLoading, isAuthenticated, jwtPayload, user],
   );
   
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
