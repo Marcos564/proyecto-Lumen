@@ -1,48 +1,10 @@
-import type { Appointment, AppointmentStatus } from '../types'
-import { appointmentsMock } from './mock/appointments.mock'
-import { delay } from './mock/delay'
-import { isPastDateTime } from '../utils/dateTime'
+import type { Appointment, AppointmentInput, AppointmentStatus } from "../types";
+import { isPastDateTime } from "../utils/dateTime";
+import { appointmentsMock } from "./mock/appointments.mock";
+import { createMockStore } from "./mock/createMockStore";
 
-let appointments: Appointment[] = [...appointmentsMock];
-
-export type AppointmentInput = Omit<Appointment, "id">;
-
-// Fecha y hora en formato 24 h: YYYY-MM-DDTHH:mm (00:00 a 23:59)
+// Fecha y hora en formato 24 h: YYYY-MM-DDTHH:mm (00:00 a 23:59).
 const DATE_TIME_24H = /^\d{4}-\d{2}-\d{2}T([01]\d|2[0-3]):[0-5]\d$/;
-
-function assertValidDate(date: string) {
-  if (!DATE_TIME_24H.test(date)) {
-    throw new Error(`Invalid appointment date: ${date}`);
-  }
-}
-
-export async function getAppointments(): Promise<Appointment[]> {
-  await delay();
-  return appointments;
-}
-
-export async function createAppointment(data: AppointmentInput): Promise<Appointment> {
-  assertValidDate(data.date)
-  if (isPastDateTime(data.date)) throw new Error('No se puede agendar un turno en una fecha u hora que ya pasó.')
-  await delay()
-  const newAppointment: Appointment = { ...data, id: crypto.randomUUID() }
-  appointments = [...appointments, newAppointment]
-  return newAppointment
-}
-
-export async function updateAppointment(
-  id: string,
-  data: AppointmentInput,
-): Promise<Appointment> {
-  assertValidDate(data.date);
-  await delay();
-  appointments = appointments.map((
-    appointment,
-  ) => (appointment.id === id ? { ...appointment, ...data } : appointment));
-  const updated = appointments.find((appointment) => appointment.id === id);
-  if (!updated) throw new Error("Appointment not found");
-  return updated;
-}
 
 const VALID_STATUSES: AppointmentStatus[] = [
   "scheduled",
@@ -50,24 +12,52 @@ const VALID_STATUSES: AppointmentStatus[] = [
   "cancelled",
 ];
 
-export async function updateAppointmentStatus(
-  id: string,
-  status: AppointmentStatus,
-): Promise<Appointment> {
-  if (!VALID_STATUSES.includes(status)) {
-    throw new Error(`Invalid appointment status: ${status}`);
+function assertValidDate(date: string) {
+  if (!DATE_TIME_24H.test(date)) {
+    throw new Error(`Invalid appointment date: ${date}`);
   }
-  await delay();
-  const current = appointments.find((appointment) => appointment.id === id);
-  if (!current) throw new Error("Appointment not found");
-  const updated: Appointment = { ...current, status };
-  appointments = appointments.map((
-    appointment,
-  ) => (appointment.id === id ? updated : appointment));
-  return updated;
 }
 
-export async function deleteAppointment(id: string): Promise<void> {
-  await delay();
-  appointments = appointments.filter((appointment) => appointment.id !== id);
-}
+const store = createMockStore<Appointment, AppointmentInput>({
+  seed: appointmentsMock,
+  validate: (data, { mode }) => {
+    assertValidDate(data.date);
+    // Al editar no se restringe: los turnos pasados tienen que poder corregirse.
+    if (mode === "create" && isPastDateTime(data.date)) {
+      throw new Error(
+        "No se puede agendar un turno en una fecha u hora que ya pasó.",
+      );
+    }
+  },
+  notFoundMessage: "Turno no encontrado",
+});
+
+export const appointmentsService = {
+  list: () => store.list(),
+
+  create: (data: AppointmentInput) => store.create(data),
+
+  update: (id: string, data: AppointmentInput) => store.update(id, data),
+
+  remove: (id: string) => store.remove(id),
+
+  async updateStatus(
+    id: string,
+    status: AppointmentStatus,
+  ): Promise<Appointment> {
+    if (!VALID_STATUSES.includes(status)) {
+      throw new Error(`Invalid appointment status: ${status}`);
+    }
+
+    const current = await store.getById(id);
+    if (!current) throw new Error("Turno no encontrado");
+
+    // El store solo actualiza los campos del input; conservamos el resto.
+    return store.update(id, {
+      patientId: current.patientId,
+      date: current.date,
+      reason: current.reason,
+      status,
+    });
+  },
+};

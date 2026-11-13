@@ -1,4 +1,6 @@
+import { isAxiosError } from "axios";
 import { instance } from "../api/axiosInstance";
+import { getApiErrorMessage } from "../api/apiError";
 import type {
   MedicalRecord,
   Pet,
@@ -11,24 +13,28 @@ import type {
 
 /*
  * Acceso HTTP a mascotas del backend LumenBackend (C# / ASP.NET Core).
- * - GET  /api/pets            → lista paginada (ResponsePetMinimun)
- * - GET  /api/pets/{id}       → detalle (ResponsePet)
- * - POST /api/pets/me         → crea la mascota del usuario autenticado
- * - PUT  /api/pets/{id}       → solo nombre y estado (RequestUpdatePet)
- * - DELETE /api/pets/{id}
- * - GET  /api/pets/{id}/medical-records
- * - GET  /api/species, /api/races → catálogos del formulario
- * Los endpoints de escritura requieren el token; el interceptor de `shared`
- * ya lo agrega a cada pedido.
+ *
+ * - GET    /pets                        lista paginada (ResponsePetMinimun)
+ * - GET    /pets/{id}                   detalle (ResponsePet)
+ * - POST   /pets/me                     crea la mascota del usuario autenticado
+ * - PUT    /pets/{id}                   solo nombre y estado (RequestUpdatePet)
+ * - DELETE /pets/{id}
+ * - GET    /pets/{id}/medical-records
+ * - GET    /species, /races             catálogos del formulario
+ *
+ * Los endpoints de escritura requieren token; el interceptor de `shared` ya lo
+ * agrega a cada pedido.
  */
 
-// La UI todavía no pagina: se pide un lote grande de una sola llamada.
+// La UI todavía no pagina: se pide un lote de una sola llamada.
 const BATCH_SIZE = 10;
 
-// Extrae el mensaje legible que el backend devuelve en los errores.
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error && error.message) return error.message;
-  return "No se pudo conectar con el servidor. ¿Está encendido el Backend?";
+function toError(error: unknown): Error {
+  return new Error(getApiErrorMessage(error));
+}
+
+function isNotFound(error: unknown): boolean {
+  return isAxiosError(error) && error.response?.status === 404;
 }
 
 async function unwrap<T>(request: Promise<{ data: T }>): Promise<T> {
@@ -44,29 +50,28 @@ export const petService = {
         }),
       );
     } catch (error) {
-      throw new Error(getErrorMessage(error));
+      throw toError(error);
     }
   },
 
   async getPet(id: string): Promise<Pet | undefined> {
     try {
       return await unwrap<Pet>(instance.get<Pet>(`pets/${id}`));
-    } catch (error: any) {
-      // 404 = mascota inexistente: para la ficha es un resultado vacío, no un error.
-      if (error?.response?.status === 404) return undefined;
-      throw new Error(getErrorMessage(error));
+    } catch (error) {
+      // 404 = mascota inexistente: para la ficha es un resultado vacío.
+      if (isNotFound(error)) return undefined;
+      throw toError(error);
     }
   },
 
   async createPet(data: PetInput): Promise<string> {
     try {
-      // POST /pets/me crea la mascota para el perfil del usuario autenticado.
       const created = await unwrap<{ id: string }>(
         instance.post<{ id: string }>("pets/me", data),
       );
       return created.id;
     } catch (error) {
-      throw new Error(getErrorMessage(error));
+      throw toError(error);
     }
   },
 
@@ -75,7 +80,7 @@ export const petService = {
     try {
       await instance.put(`pets/${id}`, data);
     } catch (error) {
-      throw new Error(getErrorMessage(error));
+      throw toError(error);
     }
   },
 
@@ -83,7 +88,7 @@ export const petService = {
     try {
       await instance.delete(`pets/${id}`);
     } catch (error) {
-      throw new Error(getErrorMessage(error));
+      throw toError(error);
     }
   },
 
@@ -94,9 +99,9 @@ export const petService = {
           params: { page: 1, pageSize: BATCH_SIZE },
         }),
       );
-    } catch (error: any) {
-      if (error?.response?.status === 404) return [];
-      throw new Error(getErrorMessage(error));
+    } catch (error) {
+      if (isNotFound(error)) return [];
+      throw toError(error);
     }
   },
 
@@ -108,7 +113,7 @@ export const petService = {
         }),
       );
     } catch (error) {
-      throw new Error(getErrorMessage(error));
+      throw toError(error);
     }
   },
 
@@ -120,7 +125,7 @@ export const petService = {
         }),
       );
     } catch (error) {
-      throw new Error(getErrorMessage(error));
+      throw toError(error);
     }
   },
 };

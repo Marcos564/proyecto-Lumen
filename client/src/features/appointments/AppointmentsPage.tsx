@@ -1,100 +1,62 @@
 import { useMemo, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Table } from "@shared/components/ui/Table";
 import { Button } from "@shared/components/ui/Button";
 import { IconButton } from "@shared/components/ui/IconButton";
 import { Modal } from "@shared/components/ui/Modal";
-import {
-  type AppointmentInput,
-  createAppointment,
-  deleteAppointment,
-  getAppointments,
-  updateAppointment,
-  updateAppointmentStatus,
-} from "@shared/services/appointments.service";
-import { petService } from "@shared/services/pets.service";
-import type { Appointment, AppointmentStatus } from "@shared/types";
+import { usePets } from "@features/patients/hooks/usePets";
+import type { Appointment, AppointmentInput } from "@shared/types";
+import { useAppointments } from "./hooks/useAppointments";
 import { AppointmentForm } from "./AppointmentForm";
 import { AppointmentStatusPopover } from "./AppointmentStatusPopover";
 
 export function AppointmentsPage() {
-  const queryClient = useQueryClient();
+  const {
+    items: appointments,
+    isLoading,
+    create,
+    update,
+    remove,
+    updateStatus,
+  } = useAppointments();
+  const { data: pets = [] } = usePets();
   const [editingAppointment, setEditingAppointment] = useState<
     Appointment | null
   >(null);
   const [isModalOpen, setModalOpen] = useState(false);
 
-  const { data: appointments = [], isLoading } = useQuery({
-    queryKey: ["appointments"],
-    queryFn: getAppointments,
-  });
-  const { data: pets = [] } = useQuery({
-    queryKey: ["pets"],
-    queryFn: petService.getPets,
-  });
-
-  const petsById = useMemo(() => new Map(pets.map((p) => [p.id, p])), [pets]);
+  const petsById = useMemo(() => new Map(pets.map((pet) => [pet.id, pet])), [
+    pets,
+  ]);
 
   const sortedAppointments = useMemo(
     () => [...appointments].sort((a, b) => a.date.localeCompare(b.date)),
     [appointments],
   );
 
-  function invalidate() {
-    queryClient.invalidateQueries({ queryKey: ["appointments"] });
+  function closeModal() {
+    setModalOpen(false);
+    setEditingAppointment(null);
   }
-
-  const createMutation = useMutation({
-    mutationFn: createAppointment,
-    onSuccess: () => {
-      invalidate();
-      setModalOpen(false);
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: AppointmentInput }) =>
-      updateAppointment(id, data),
-    onSuccess: () => {
-      invalidate();
-      setModalOpen(false);
-      setEditingAppointment(null);
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: deleteAppointment,
-    onSuccess: invalidate,
-  });
-
-  const statusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: AppointmentStatus }) =>
-      updateAppointmentStatus(id, status),
-    onSuccess: invalidate,
-    onError: (error) => window.alert(error.message),
-  });
 
   function openCreateModal() {
     setEditingAppointment(null);
     setModalOpen(true);
   }
 
-  function openEditModal(appointment: Appointment) {
-    setEditingAppointment(appointment);
-    setModalOpen(true);
-  }
-
   function handleSubmit(values: AppointmentInput) {
     if (editingAppointment) {
-      updateMutation.mutate({ id: editingAppointment.id, data: values });
+      update.mutate(
+        { id: editingAppointment.id, data: values },
+        { onSuccess: closeModal },
+      );
     } else {
-      createMutation.mutate(values);
+      create.mutate(values, { onSuccess: closeModal });
     }
   }
 
-  const canCreateAppointment = pets.length > 0
-  const formError = (createMutation.error ?? updateMutation.error)?.message
+  const canCreateAppointment = pets.length > 0;
+  const formError = (create.error ?? update.error)?.message;
 
   return (
     <div className="flex flex-col gap-6">
@@ -113,58 +75,62 @@ export function AppointmentsPage() {
 
       <Table<Appointment>
         data={sortedAppointments}
-        keyExtractor={(a) => a.id}
+        keyExtractor={(appointment) => appointment.id}
         emptyMessage={isLoading
           ? "Cargando turnos..."
           : "No hay turnos cargados."}
         columns={[
           {
             header: "Fecha",
-            render: (a) =>
-              new Date(a.date).toLocaleDateString("es-AR", {
+            render: (appointment) =>
+              new Date(appointment.date).toLocaleDateString("es-AR", {
                 dateStyle: "short",
               }),
           },
           {
             header: "Hora",
-            render: (a) =>
-              new Date(a.date).toLocaleTimeString("es-AR", {
+            render: (appointment) =>
+              new Date(appointment.date).toLocaleTimeString("es-AR", {
                 timeStyle: "short",
                 hourCycle: "h23",
               }),
           },
           {
             header: "Paciente",
-            render: (a) => petsById.get(a.patientId)?.name ?? "—",
+            render: (appointment) =>
+              petsById.get(appointment.patientId)?.name ?? "—",
           },
-          { header: "Motivo", render: (a) => a.reason },
+          { header: "Motivo", render: (appointment) => appointment.reason },
           {
             header: "Estado",
-            render: (a) => (
+            render: (appointment) => (
               <AppointmentStatusPopover
-                status={a.status}
-                disabled={statusMutation.isPending &&
-                  statusMutation.variables?.id === a.id}
+                status={appointment.status}
+                disabled={updateStatus.isPending &&
+                  updateStatus.variables?.id === appointment.id}
                 onChange={(status) =>
-                  statusMutation.mutate({ id: a.id, status })}
+                  updateStatus.mutate({ id: appointment.id, status })}
               />
             ),
           },
           {
             header: "",
             className: "w-20",
-            render: (a) => (
+            render: (appointment) => (
               <div className="flex items-center gap-1">
                 <IconButton
                   icon={Pencil}
                   label="Editar"
-                  onClick={() => openEditModal(a)}
+                  onClick={() => {
+                    setEditingAppointment(appointment);
+                    setModalOpen(true);
+                  }}
                 />
                 <IconButton
                   icon={Trash2}
                   label="Eliminar"
                   tone="danger"
-                  onClick={() => deleteMutation.mutate(a.id)}
+                  onClick={() => remove.mutate(appointment.id)}
                 />
               </div>
             ),
@@ -175,14 +141,14 @@ export function AppointmentsPage() {
       <Modal
         open={isModalOpen}
         title={editingAppointment ? "Editar turno" : "Nuevo turno"}
-        onClose={() => setModalOpen(false)}
+        onClose={closeModal}
       >
         <AppointmentForm
           pets={pets}
           initialValues={editingAppointment ?? undefined}
           error={formError}
           onSubmit={handleSubmit}
-          submitting={createMutation.isPending || updateMutation.isPending}
+          submitting={create.isPending || update.isPending}
         />
       </Modal>
     </div>

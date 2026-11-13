@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Button } from "@shared/components/ui/Button";
 import { Field, inputClass } from "@shared/components/ui/Field";
-import type { InventoryItemInput } from "@shared/services/inventory.service";
-import type { InventoryCategory } from "@shared/types";
+import type { InventoryCategory, InventoryItemInput } from "@shared/types";
 
 interface InventoryItemFormProps {
   initialValues?: InventoryItemInput;

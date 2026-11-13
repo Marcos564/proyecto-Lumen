@@ -1,46 +1,20 @@
-import type { Specialist } from "../types";
+import type { Specialist, SpecialistInput } from "../types";
+import { createMockStore } from "./mock/createMockStore";
 import { specialistsMock } from "./mock/specialists.mock";
-import { delay } from "./mock/delay";
 
-let specialists: Specialist[] = [...specialistsMock];
+const store = createMockStore<Specialist, SpecialistInput>({
+  seed: specialistsMock,
+  notFoundMessage: "Especialista no encontrado",
+});
 
-export type SpecialistInput = Omit<Specialist, "id">;
+export const specialistsService = {
+  list: () => store.list(),
 
-export async function getSpecialists(): Promise<Specialist[]> {
-  await delay();
-  return specialists;
-}
+  getById: (id: string) => store.getById(id),
 
-export async function getSpecialistById(
-  id: string,
-): Promise<Specialist | undefined> {
-  await delay();
-  return specialists.find((specialist) => specialist.id === id);
-}
+  create: (data: SpecialistInput) => store.create(data),
 
-export async function createSpecialist(
-  data: SpecialistInput,
-): Promise<Specialist> {
-  await delay();
-  const newSpecialist: Specialist = { ...data, id: crypto.randomUUID() };
-  specialists = [...specialists, newSpecialist];
-  return newSpecialist;
-}
+  update: (id: string, data: SpecialistInput) => store.update(id, data),
 
-export async function updateSpecialist(
-  id: string,
-  data: SpecialistInput,
-): Promise<Specialist> {
-  await delay();
-  specialists = specialists.map((
-    specialist,
-  ) => (specialist.id === id ? { ...specialist, ...data } : specialist));
-  const updated = specialists.find((specialist) => specialist.id === id);
-  if (!updated) throw new Error("Specialist not found");
-  return updated;
-}
-
-export async function deleteSpecialist(id: string): Promise<void> {
-  await delay();
-  specialists = specialists.filter((specialist) => specialist.id !== id);
-}
+  remove: (id: string) => store.remove(id),
+};

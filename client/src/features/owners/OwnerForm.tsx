@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@shared/components/ui/Button";
 import { Field, inputClass } from "@shared/components/ui/Field";
-import type { OwnerInput } from "@shared/services/owners.service";
+import type { OwnerInput } from "@shared/types";
 
 interface OwnerFormProps {
   initialValues?: OwnerInput;

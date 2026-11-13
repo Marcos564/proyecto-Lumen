@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@shared/components/ui/Button";
 import { Field, inputClass } from "@shared/components/ui/Field";
-import type { SpecialistInput } from "@shared/services/specialists.service";
+import type { SpecialistInput } from "@shared/types";
 
 interface SpecialistFormProps {
   initialValues?: SpecialistInput;

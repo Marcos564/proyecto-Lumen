@@ -1,103 +1,77 @@
-import { lazy, Suspense } from "react";
+import { Suspense, type ReactNode } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { AppLayout } from "@layouts/AppLayout";
+import AuthLayout from "@layouts/AuthLayout";
 import { FallbackLoading } from "@shared/components/FallbackLoading";
 import { RequireAuth } from "@shared/components/RequireAuth";
-import AuthLayout from "@layouts/AuthLayout";
 import { useAuth } from "@shared";
-const PatientsListPage = lazy(() =>
-  import("@features/patients/PatientsListPage").then((module) => ({
-    default: module.PatientsListPage,
-  })).catch((error) => {
-    console.error("Error loading PatientsListPage:", error);
-    return { default: () => <div>Error loading PatientsListPage</div> };
-  })
+import { lazyPage } from "@shared/utils/lazyPage";
+
+const PatientsListPage = lazyPage(
+  "PatientsListPage",
+  () => import("@features/patients/PatientsListPage"),
 );
-const PatientDetailPage = lazy(() =>
-  import("@features/patients/PatientDetailPage").then((module) => ({
-    default: module.PatientDetailPage,
-  })).catch((error) => {
-    console.error("Error loading PatientDetailPage:", error);
-    return { default: () => <div>Error loading PatientDetailPage</div> };
-  })
+const PatientDetailPage = lazyPage(
+  "PatientDetailPage",
+  () => import("@features/patients/PatientDetailPage"),
 );
-const SpecialistsListPage = lazy(() =>
-  import("@features/specialists/SpecialistsListPage").then((module) => ({
-    default: module.SpecialistsListPage,
-  })).catch((error) => {
-    console.error("Error loading SpecialistsListPage:", error);
-    return { default: () => <div>Error loading SpecialistsListPage</div> };
-  })
+const SpecialistsListPage = lazyPage(
+  "SpecialistsListPage",
+  () => import("@features/specialists/SpecialistsListPage"),
 );
-const AppointmentsPage = lazy(() =>
-  import("@features/appointments/AppointmentsPage").then((module) => ({
-    default: module.AppointmentsPage,
-  })).catch((error) => {
-    console.error("Error loading AppointmentsPage:", error);
-    return { default: () => <div>Error loading AppointmentsPage</div> };
-  })
+const AppointmentsPage = lazyPage(
+  "AppointmentsPage",
+  () => import("@features/appointments/AppointmentsPage"),
 );
-const InventoryPage = lazy(() =>
-  import("@features/inventory/InventoryPage").then((module) => ({
-    default: module.InventoryPage,
-  })).catch((error) => {
-    console.error("Error loading InventoryPage:", error);
-    return { default: () => <div>Error loading InventoryPage</div> };
-  })
+const InventoryPage = lazyPage(
+  "InventoryPage",
+  () => import("@features/inventory/InventoryPage"),
 );
-const OwnersListPage = lazy(() =>
-  import("@features/owners/OwnersListPage").then((module) => ({
-    default: module.OwnersListPage,
-  })).catch((error) => {
-    console.error("Error loading OwnersListPage:", error);
-    return { default: () => <div>Error loading OwnersListPage</div> };
-  })
+const OwnersListPage = lazyPage(
+  "OwnersListPage",
+  () => import("@features/owners/OwnersListPage"),
 );
-const LoginPage = lazy(() =>
-  import("@features/auth/page/LoginPage").then((module) => ({
-    default: module.LoginPage,
-  })).catch((error) => {
-    console.error("Error loading LoginPage:", error);
-    return { default: () => <div>Error loading LoginPage</div> };
-  })
+const LoginPage = lazyPage(
+  "LoginPage",
+  () => import("@features/auth/page/LoginPage"),
 );
-const ComponenteInfinito = lazy(() =>
-  import("@shared/components/FallbackActive").then((module) => ({
-    default: module.ComponenteInfinito,
-  })).catch((error) => {
-    console.error("Error loading OwnersListPage:", error);
-    return { default: () => <div>Error loading OwnersListPage</div> };
-  })
+const LandingPage = lazyPage(
+  "LandingPage",
+  () => import("@features/landing/LandingPage"),
 );
-const LandingPage = lazy(() =>
-  import("@features/landing/LandingPage").then((module) => ({
-    default: module.LandingPage,
-  })).catch((error) => {
-    console.error("Error loading LandingPage:", error);
-    return { default: () => <div>Error loading LandingPage</div> };
-  })
+const ComponenteInfinito = lazyPage(
+  "ComponenteInfinito",
+  () => import("@shared/components/FallbackActive"),
 );
+
+/** Envuelve una página diferida con el loader común de la aplicación. */
+function Page({ children }: { children: ReactNode }) {
+  return <Suspense fallback={<FallbackLoading />}>{children}</Suspense>;
+}
+
 // Sin sesión: landing pública. Con sesión: directo al panel.
 function HomeRoute() {
   const { isAuthenticated } = useAuth();
-  return isAuthenticated
-    ? <Navigate to="/pets" replace />
-    : <LandingPage />;
+  return isAuthenticated ? <Navigate to="/pets" replace /> : <LandingPage />;
 }
-export const Routes = createBrowserRouter([
 
+const privateRoutes = [
+  { path: "pets", Page: PatientsListPage },
+  { path: "pets/:id", Page: PatientDetailPage },
+  { path: "owners", Page: OwnersListPage },
+  { path: "appointments", Page: AppointmentsPage },
+  { path: "stock", Page: InventoryPage },
+  { path: "staff", Page: SpecialistsListPage },
+];
+
+export const Routes = createBrowserRouter([
   {
     path: "/home",
     element: (
-      <Suspense fallback={<FallbackLoading />}>
+      <Page>
         <HomeRoute />
-      </Suspense>
+      </Page>
     ),
-    children: [
-      {
-        index:true
-      }
-    ]
   },
   {
     path: "/",
@@ -107,90 +81,36 @@ export const Routes = createBrowserRouter([
       </RequireAuth>
     ),
     children: [
-      {
-        index: true,
-        element: <Navigate to="/pets" replace />,
-      },
-      {
-        path: "pets",
+      { index: true, element: <Navigate to="/pets" replace /> },
+      ...privateRoutes.map(({ path, Page: RoutePage }) => ({
+        path,
         element: (
-          <Suspense fallback={<FallbackLoading />}>
-            <PatientsListPage />
-          </Suspense>
+          <Page>
+            <RoutePage />
+          </Page>
         ),
-      },
-      {
-        path: "pets/:id",
-        element: (
-          <Suspense fallback={<FallbackLoading />}>
-            <PatientDetailPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: "owners",
-        element: (
-          <Suspense fallback={<FallbackLoading />}>
-            <OwnersListPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: "appointments",
-        element: (
-          <Suspense fallback={<FallbackLoading />}>
-            <AppointmentsPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: "stock",
-        element: (
-          <Suspense fallback={<FallbackLoading />}>
-            <InventoryPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: "staff",
-        element: (
-          <Suspense fallback={<FallbackLoading />}>
-            <SpecialistsListPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: "owners",
-        element: (
-          <Suspense fallback={<FallbackLoading />}>
-            <OwnersListPage />
-          </Suspense>
-        ),
-      },
+      })),
     ],
   },
   {
     path: "/auth",
     element: <AuthLayout />,
     children: [
-      {
-        index: true,
-        element: <Navigate to="/auth/login" replace />,
-      },
+      { index: true, element: <Navigate to="/auth/login" replace /> },
       {
         path: "loading",
         element: (
-          <Suspense fallback={<FallbackLoading />}>
+          <Page>
             <ComponenteInfinito />
-          </Suspense>
+          </Page>
         ),
       },
       {
         path: "login",
         element: (
-          <Suspense fallback={<FallbackLoading />}>
+          <Page>
             <LoginPage />
-          </Suspense>
+          </Page>
         ),
       },
     ],

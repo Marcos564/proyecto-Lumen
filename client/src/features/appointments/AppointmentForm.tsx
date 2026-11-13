@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { Button } from '@shared/components/ui/Button'
 import { Field, inputClass } from '@shared/components/ui/Field'
-import type { AppointmentInput } from '@shared/services/appointments.service'
 import { isPastDateTime, nowDateTimeValue } from '@shared/utils/dateTime'
-import type { AppointmentStatus } from '@shared/types'
+import type { AppointmentInput, AppointmentStatus } from '@shared/types'
 import type { PetSummary } from '@shared/types/pets'
 
 interface AppointmentFormProps {

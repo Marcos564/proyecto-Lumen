@@ -1,5 +1,6 @@
 import type { Owner } from "../../types";
 
+/** Datos de ejemplo para la sección de responsables (sin backend todavía). */
 export const ownersMock: Owner[] = [
   {
     id: "o1",
@@ -22,7 +23,7 @@ export const ownersMock: Owner[] = [
   {
     id: "o3",
     firstName: "Sam",
-    lastName: "Diaz",
+    lastName: "Díaz",
     dni: "28987654",
     address: "Belgrano 850, Quilmes",
     phone: "+54 9 11 5555-0103",
@@ -35,5 +36,40 @@ export const ownersMock: Owner[] = [
     address: "Mitre 455, Avellaneda",
     phone: "+54 9 11 5555-0104",
     email: "emily.torres@example.com",
+  },
+  {
+    id: "o5",
+    firstName: "Martina",
+    lastName: "Álvarez",
+    dni: "36777888",
+    address: "Cabildo 2870, CABA",
+    phone: "+54 9 11 5555-0105",
+    email: "martina.alvarez@example.com",
+  },
+  {
+    id: "o6",
+    firstName: "Bruno",
+    lastName: "Salvatierra",
+    dni: "27444555",
+    address: "Rivadavia 9120, Liniers",
+    phone: "+54 9 11 5555-0106",
+  },
+  {
+    id: "o7",
+    firstName: "Valentina",
+    lastName: "Ríos",
+    dni: "38999000",
+    address: "San Martín 640, San Isidro",
+    phone: "+54 9 11 5555-0107",
+    email: "valentina.rios@example.com",
+  },
+  {
+    id: "o8",
+    firstName: "Nicolás",
+    lastName: "Ferreyra",
+    dni: "31555666",
+    address: "Alsina 320, Morón",
+    phone: "+54 9 11 5555-0108",
+    email: "nicolas.ferreyra@example.com",
   },
 ];

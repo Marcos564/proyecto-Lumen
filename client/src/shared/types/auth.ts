@@ -1,4 +1,3 @@
-export type AuthMode = "login" | "register" | "forgot-password";
 export interface User {
   id: string;
   fullName: string;
@@ -7,15 +6,6 @@ export interface User {
 export interface SignInRequest {
   email: string;
   password: string;
-}
-export interface SignUpRequest {
-  name: string;
-  surname: string;
-  password: string;
-  confirmPassword: string;
-  phone?: string;
-  email: string;
-  acceptTerms: boolean;
 }
 export interface SignInResponse {
   accessToken: string;

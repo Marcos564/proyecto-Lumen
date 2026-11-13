@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Table } from "@shared/components/ui/Table";
 import { SearchInput } from "@shared/components/ui/SearchInput";
@@ -7,80 +6,45 @@ import { Button } from "@shared/components/ui/Button";
 import { IconButton } from "@shared/components/ui/IconButton";
 import { Badge } from "@shared/components/ui/Badge";
 import { Modal } from "@shared/components/ui/Modal";
-import {
-  createSpecialist,
-  deleteSpecialist,
-  getSpecialists,
-  type SpecialistInput,
-  updateSpecialist,
-} from "@shared/services/specialists.service";
-import type { Specialist } from "@shared/types";
+import type { Specialist, SpecialistInput } from "@shared/types";
+import { useSpecialists } from "./hooks/useSpecialists";
 import { SpecialistForm } from "./SpecialistForm";
 
 export function SpecialistsListPage() {
-  const queryClient = useQueryClient();
+  const { items, isLoading, create, update, remove } = useSpecialists();
   const [search, setSearch] = useState("");
   const [editingSpecialist, setEditingSpecialist] = useState<Specialist | null>(
     null,
   );
   const [isModalOpen, setModalOpen] = useState(false);
 
-  const { data: specialists = [], isLoading } = useQuery({
-    queryKey: ["specialists"],
-    queryFn: getSpecialists,
-  });
-
-  function invalidate() {
-    queryClient.invalidateQueries({ queryKey: ["specialists"] });
-  }
-
-  const createMutation = useMutation({
-    mutationFn: createSpecialist,
-    onSuccess: () => {
-      invalidate();
-      setModalOpen(false);
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: SpecialistInput }) =>
-      updateSpecialist(id, data),
-    onSuccess: () => {
-      invalidate();
-      setModalOpen(false);
-      setEditingSpecialist(null);
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: deleteSpecialist,
-    onSuccess: invalidate,
-  });
-
   const filteredSpecialists = useMemo(() => {
     const term = search.trim().toLowerCase();
-    if (!term) return specialists;
-    return specialists.filter((s) =>
-      s.name.toLowerCase().includes(term) ||
-      s.specialty.toLowerCase().includes(term)
+    if (!term) return items;
+    return items.filter((specialist) =>
+      specialist.name.toLowerCase().includes(term) ||
+      specialist.specialty.toLowerCase().includes(term)
     );
-  }, [specialists, search]);
+  }, [items, search]);
+
+  function closeModal() {
+    setModalOpen(false);
+    setEditingSpecialist(null);
+  }
 
   function openCreateModal() {
     setEditingSpecialist(null);
     setModalOpen(true);
   }
 
-  function openEditModal(specialist: Specialist) {
-    setEditingSpecialist(specialist);
-    setModalOpen(true);
-  }
-
   function handleSubmit(values: SpecialistInput) {
     if (editingSpecialist) {
-      updateMutation.mutate({ id: editingSpecialist.id, data: values });
+      update.mutate(
+        { id: editingSpecialist.id, data: values },
+        { onSuccess: closeModal },
+      );
     } else {
-      createMutation.mutate(values);
+      create.mutate(values, { onSuccess: closeModal });
     }
   }
 
@@ -109,43 +73,48 @@ export function SpecialistsListPage() {
 
       <Table<Specialist>
         data={filteredSpecialists}
-        keyExtractor={(s) => s.id}
+        keyExtractor={(specialist) => specialist.id}
         emptyMessage={isLoading
           ? "Cargando especialistas..."
           : "No se encontraron especialistas."}
         columns={[
           {
             header: "Nombre",
-            render: (s) => (
-              <span className="font-medium text-slate-800">{s.name}</span>
+            render: (specialist) => (
+              <span className="font-medium text-slate-800">
+                {specialist.name}
+              </span>
             ),
           },
-          { header: "Especialidad", render: (s) => s.specialty },
-          { header: "Email", render: (s) => s.email || "—" },
-          { header: "Teléfono", render: (s) => s.phone || "—" },
+          { header: "Especialidad", render: (specialist) => specialist.specialty },
+          { header: "Email", render: (specialist) => specialist.email || "—" },
+          { header: "Teléfono", render: (specialist) => specialist.phone || "—" },
           {
             header: "Estado",
-            render: (s) => (
-              <Badge tone={s.active ? "success" : "neutral"}>
-                {s.active ? "Activo" : "Inactivo"}
+            render: (specialist) => (
+              <Badge tone={specialist.active ? "success" : "neutral"}>
+                {specialist.active ? "Activo" : "Inactivo"}
               </Badge>
             ),
           },
           {
             header: "",
             className: "w-20",
-            render: (s) => (
+            render: (specialist) => (
               <div className="flex items-center gap-1">
                 <IconButton
                   icon={Pencil}
                   label="Editar"
-                  onClick={() => openEditModal(s)}
+                  onClick={() => {
+                    setEditingSpecialist(specialist);
+                    setModalOpen(true);
+                  }}
                 />
                 <IconButton
                   icon={Trash2}
                   label="Eliminar"
                   tone="danger"
-                  onClick={() => deleteMutation.mutate(s.id)}
+                  onClick={() => remove.mutate(specialist.id)}
                 />
               </div>
             ),
@@ -155,13 +124,15 @@ export function SpecialistsListPage() {
 
       <Modal
         open={isModalOpen}
-        title={editingSpecialist ? "Editar especialista" : "Nuevo especialista"}
-        onClose={() => setModalOpen(false)}
+        title={editingSpecialist
+          ? "Editar especialista"
+          : "Nuevo especialista"}
+        onClose={closeModal}
       >
         <SpecialistForm
           initialValues={editingSpecialist ?? undefined}
           onSubmit={handleSubmit}
-          submitting={createMutation.isPending || updateMutation.isPending}
+          submitting={create.isPending || update.isPending}
         />
       </Modal>
     </div>

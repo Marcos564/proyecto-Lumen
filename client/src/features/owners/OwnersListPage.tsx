@@ -1,87 +1,55 @@
 import { useMemo, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Table } from "@shared/components/ui/Table";
 import { SearchInput } from "@shared/components/ui/SearchInput";
 import { Button } from "@shared/components/ui/Button";
 import { IconButton } from "@shared/components/ui/IconButton";
 import { Modal } from "@shared/components/ui/Modal";
-import {
-  createOwner,
-  deleteOwner,
-  getOwners,
-  type OwnerInput,
-  type OwnerWithPets,
-  updateOwner,
-} from "@shared/services/owners.service";
+import type { OwnerInput, OwnerWithPets } from "@shared/types";
+import { useOwners } from "./hooks/useOwners";
 import { OwnerForm } from "./OwnerForm";
 import { ownerFullName } from "./ownerFullName";
 
 export function OwnersListPage() {
-  const queryClient = useQueryClient();
+  const { items: owners, isLoading, create, update, remove } = useOwners();
   const [search, setSearch] = useState("");
   const [editingOwner, setEditingOwner] = useState<OwnerWithPets | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
 
-  const { data: owners = [], isLoading } = useQuery({
-    queryKey: ["owners"],
-    queryFn: getOwners,
-  });
-
-  function invalidate() {
-    queryClient.invalidateQueries({ queryKey: ["owners"] });
+  function closeModal() {
+    setModalOpen(false);
+    setEditingOwner(null);
   }
 
-  const createMutation = useMutation({
-    mutationFn: createOwner,
-    onSuccess: () => {
-      invalidate();
-      setModalOpen(false);
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: OwnerInput }) =>
-      updateOwner(id, data),
-    onSuccess: () => {
-      invalidate();
-      setModalOpen(false);
-      setEditingOwner(null);
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: deleteOwner,
-    onSuccess: invalidate,
-    onError: (error) => window.alert(error.message),
-  });
-
-  const filteredOwners = useMemo(() => {
-    const term = search.trim().toLowerCase();
-    if (!term) return owners;
-    const dniTerm = term.replace(/\./g, "");
-    return owners.filter((o) =>
-      ownerFullName(o).toLowerCase().includes(term) ||
-      (dniTerm !== "" && o.dni.includes(dniTerm))
-    );
-  }, [owners, search]);
-
   function openModal(owner: OwnerWithPets | null) {
-    createMutation.reset();
-    updateMutation.reset();
+    create.reset();
+    update.reset();
     setEditingOwner(owner);
     setModalOpen(true);
   }
 
   function handleSubmit(values: OwnerInput) {
     if (editingOwner) {
-      updateMutation.mutate({ id: editingOwner.id, data: values });
+      update.mutate(
+        { id: editingOwner.id, data: values },
+        { onSuccess: closeModal },
+      );
     } else {
-      createMutation.mutate(values);
+      create.mutate(values, { onSuccess: closeModal });
     }
   }
 
-  const formError = (createMutation.error ?? updateMutation.error)?.message;
+  const filteredOwners = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    if (!term) return owners;
+    const dniTerm = term.replace(/\./g, "");
+    return owners.filter((owner) =>
+      ownerFullName(owner).toLowerCase().includes(term) ||
+      (dniTerm !== "" && owner.dni.includes(dniTerm))
+    );
+  }, [owners, search]);
+
+  const formError = (create.error ?? update.error)?.message;
 
   return (
     <div className="flex flex-col gap-6">
@@ -106,43 +74,46 @@ export function OwnersListPage() {
 
       <Table<OwnerWithPets>
         data={filteredOwners}
-        keyExtractor={(o) => o.id}
+        keyExtractor={(owner) => owner.id}
         emptyMessage={isLoading
           ? "Cargando responsables..."
-          : "No se encontraron Responsables."}
+          : "No se encontraron responsables."}
         columns={[
           {
             header: "Nombre",
-            render: (o) => (
+            render: (owner) => (
               <span className="font-medium text-slate-800">
-                {ownerFullName(o)}
+                {ownerFullName(owner)}
               </span>
             ),
           },
-          { header: "DNI", render: (o) => o.dni },
-          { header: "Dirección", render: (o) => o.address },
-          { header: "Teléfono", render: (o) => o.phone },
-          { header: "Email", render: (o) => o.email || "—" },
-          { header: "Mascotas", render: (o) => o.petCount },
+          { header: "DNI", render: (owner) => owner.dni },
+          { header: "Dirección", render: (owner) => owner.address },
+          { header: "Teléfono", render: (owner) => owner.phone },
+          { header: "Email", render: (owner) => owner.email || "—" },
+          { header: "Mascotas", render: (owner) => owner.petCount },
           {
             header: "",
             className: "w-20",
-            render: (o) => (
+            render: (owner) => (
               <div className="flex items-center gap-1">
                 <IconButton
                   icon={Pencil}
                   label="Editar"
-                  onClick={() => openModal(o)}
+                  onClick={() => openModal(owner)}
                 />
                 <IconButton
                   icon={Trash2}
-                  label={o.petCount > 0
+                  label={owner.petCount > 0
                     ? "No se puede eliminar: tiene mascotas"
                     : "Eliminar"}
                   tone="danger"
                   className="disabled:cursor-not-allowed disabled:opacity-40"
-                  disabled={o.petCount > 0}
-                  onClick={() => deleteMutation.mutate(o.id)}
+                  disabled={owner.petCount > 0}
+                  onClick={() =>
+                    remove.mutate(owner.id, {
+                      onError: (error) => window.alert(error.message),
+                    })}
                 />
               </div>
             ),
@@ -153,14 +124,14 @@ export function OwnersListPage() {
       <Modal
         open={isModalOpen}
         title={editingOwner ? "Editar responsable" : "Nuevo responsable"}
-        onClose={() => setModalOpen(false)}
+        onClose={closeModal}
       >
         <OwnerForm
           initialValues={editingOwner ?? undefined}
           petCount={editingOwner?.petCount}
           error={formError}
           onSubmit={handleSubmit}
-          submitting={createMutation.isPending || updateMutation.isPending}
+          submitting={create.isPending || update.isPending}
         />
       </Modal>
     </div>

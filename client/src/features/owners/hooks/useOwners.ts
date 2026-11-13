@@ -1,34 +1,22 @@
-import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import {
-  getOwnerById,
-  getOwners,
-  type OwnerWithPets,
-} from "@shared/services/owners.service";
+import { useCrudResource } from "@shared/hooks/useCrudResource";
+import { ownersService } from "@shared/services/owners.service";
 
-// Claves de caché de React Query para responsables. Usarlas siempre desde acá
-// para que las invalidaciones de otras features (p. ej. pacientes) coincidan.
+// Claves de caché para responsables. Usarlas siempre desde acá para que las
+// invalidaciones coincidan.
 export const ownerKeys = {
   all: ["owners"] as const,
   detail: (id: string) => ["owners", id] as const,
 };
 
 export function useOwners() {
-  return useQuery({ queryKey: ownerKeys.all, queryFn: getOwners });
+  return useCrudResource(ownerKeys.all, ownersService);
 }
 
 export function useOwner(id: string | undefined) {
   return useQuery({
     queryKey: ownerKeys.detail(id ?? ""),
-    queryFn: () => getOwnerById(id as string),
+    queryFn: () => ownersService.getById(id as string),
     enabled: Boolean(id),
   });
-}
-
-// Índice id → responsable para resolver rápido el responsable de cada paciente.
-export function useOwnersById(owners: OwnerWithPets[]) {
-  return useMemo(
-    () => new Map(owners.map((owner) => [owner.id, owner])),
-    [owners],
-  );
 }

@@ -1,5 +1,6 @@
 import type { InventoryItem } from "../../types";
 
+/** Datos de ejemplo para el inventario (sin backend todavía). */
 export const inventoryMock: InventoryItem[] = [
   {
     id: "i1",
@@ -47,6 +48,38 @@ export const inventoryMock: InventoryItem[] = [
     category: "other",
     stock: 18,
     minStock: 10,
+    unit: "unidades",
+  },
+  {
+    id: "i7",
+    name: "Meloxicam 2mg",
+    category: "medication",
+    stock: 24,
+    minStock: 12,
+    unit: "comprimidos",
+  },
+  {
+    id: "i8",
+    name: "Suero fisiológico 500ml",
+    category: "supply",
+    stock: 16,
+    minStock: 20,
+    unit: "bolsas",
+  },
+  {
+    id: "i9",
+    name: "Alimento húmedo gato",
+    category: "food",
+    stock: 48,
+    minStock: 24,
+    unit: "latas",
+  },
+  {
+    id: "i10",
+    name: "Termómetro digital",
+    category: "other",
+    stock: 3,
+    minStock: 5,
     unit: "unidades",
   },
 ];

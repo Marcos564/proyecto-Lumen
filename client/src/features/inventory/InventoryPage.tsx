@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Table } from "@shared/components/ui/Table";
 import { SearchInput } from "@shared/components/ui/SearchInput";
@@ -7,14 +6,12 @@ import { Button } from "@shared/components/ui/Button";
 import { IconButton } from "@shared/components/ui/IconButton";
 import { Badge } from "@shared/components/ui/Badge";
 import { Modal } from "@shared/components/ui/Modal";
-import {
-  createInventoryItem,
-  deleteInventoryItem,
-  getInventoryItems,
-  type InventoryItemInput,
-  updateInventoryItem,
-} from "@shared/services/inventory.service";
-import type { InventoryCategory, InventoryItem } from "@shared/types";
+import type {
+  InventoryCategory,
+  InventoryItem,
+  InventoryItemInput,
+} from "@shared/types";
+import { useInventory } from "./hooks/useInventory";
 import { InventoryItemForm } from "./InventoryItemForm";
 
 const categoryLabels: Record<InventoryCategory, string> = {
@@ -25,42 +22,10 @@ const categoryLabels: Record<InventoryCategory, string> = {
 };
 
 export function InventoryPage() {
-  const queryClient = useQueryClient();
+  const { items, isLoading, create, update, remove } = useInventory();
   const [search, setSearch] = useState("");
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
-
-  const { data: items = [], isLoading } = useQuery({
-    queryKey: ["inventory"],
-    queryFn: getInventoryItems,
-  });
-
-  function invalidate() {
-    queryClient.invalidateQueries({ queryKey: ["inventory"] });
-  }
-
-  const createMutation = useMutation({
-    mutationFn: createInventoryItem,
-    onSuccess: () => {
-      invalidate();
-      setModalOpen(false);
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: InventoryItemInput }) =>
-      updateInventoryItem(id, data),
-    onSuccess: () => {
-      invalidate();
-      setModalOpen(false);
-      setEditingItem(null);
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: deleteInventoryItem,
-    onSuccess: invalidate,
-  });
 
   const filteredItems = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -68,21 +33,24 @@ export function InventoryPage() {
     return items.filter((item) => item.name.toLowerCase().includes(term));
   }, [items, search]);
 
+  function closeModal() {
+    setModalOpen(false);
+    setEditingItem(null);
+  }
+
   function openCreateModal() {
     setEditingItem(null);
     setModalOpen(true);
   }
 
-  function openEditModal(item: InventoryItem) {
-    setEditingItem(item);
-    setModalOpen(true);
-  }
-
   function handleSubmit(values: InventoryItemInput) {
     if (editingItem) {
-      updateMutation.mutate({ id: editingItem.id, data: values });
+      update.mutate(
+        { id: editingItem.id, data: values },
+        { onSuccess: closeModal },
+      );
     } else {
-      createMutation.mutate(values);
+      create.mutate(values, { onSuccess: closeModal });
     }
   }
 
@@ -144,13 +112,16 @@ export function InventoryPage() {
                 <IconButton
                   icon={Pencil}
                   label="Editar"
-                  onClick={() => openEditModal(item)}
+                  onClick={() => {
+                    setEditingItem(item);
+                    setModalOpen(true);
+                  }}
                 />
                 <IconButton
                   icon={Trash2}
                   label="Eliminar"
                   tone="danger"
-                  onClick={() => deleteMutation.mutate(item.id)}
+                  onClick={() => remove.mutate(item.id)}
                 />
               </div>
             ),
@@ -161,12 +132,12 @@ export function InventoryPage() {
       <Modal
         open={isModalOpen}
         title={editingItem ? "Editar insumo" : "Nuevo insumo"}
-        onClose={() => setModalOpen(false)}
+        onClose={closeModal}
       >
         <InventoryItemForm
           initialValues={editingItem ?? undefined}
           onSubmit={handleSubmit}
-          submitting={createMutation.isPending || updateMutation.isPending}
+          submitting={create.isPending || update.isPending}
         />
       </Modal>
     </div>

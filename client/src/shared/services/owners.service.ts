@@ -1,14 +1,6 @@
-import type { Owner } from "../types";
+import type { Owner, OwnerInput, OwnerWithPets } from "../types";
+import { createMockStore } from "./mock/createMockStore";
 import { ownersMock } from "./mock/owners.mock";
-import { delay } from "./mock/delay";
-
-let owners: Owner[] = [...ownersMock];
-
-export type OwnerInput = Omit<Owner, "id">;
-
-export interface OwnerWithPets extends Owner {
-  petCount: number;
-}
 
 const DNI_REGEX = /^\d{7,8}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -25,7 +17,10 @@ function normalizeOwner(data: OwnerInput): OwnerInput {
   };
 }
 
-function validateOwner(data: OwnerInput, currentId?: string) {
+function validateOwner(
+  data: OwnerInput,
+  { items, currentId }: { items: readonly Owner[]; currentId?: string },
+) {
   if (!data.firstName || !data.lastName || !data.address || !data.phone) {
     throw new Error("Nombre, apellido, dirección y teléfono son obligatorios.");
   }
@@ -36,61 +31,40 @@ function validateOwner(data: OwnerInput, currentId?: string) {
     throw new Error("El email no es válido.");
   }
   if (
-    owners.some((owner) => owner.dni === data.dni && owner.id !== currentId)
+    items.some((owner) => owner.dni === data.dni && owner.id !== currentId)
   ) {
     throw new Error("Ya existe un responsable con ese DNI.");
   }
 }
 
-// La cantidad de mascotas ya no se calcula acá: las mascotas viven en el
-// backend y cada una se vincula al perfil del usuario autenticado, no a un
-// responsable de este mock. Se muestra 0 hasta que responsables conecte API.
-function withPetCount(owner: Owner): OwnerWithPets {
-  return { ...owner, petCount: 0 };
-}
+const store = createMockStore<Owner, OwnerInput>({
+  seed: ownersMock,
+  normalize: normalizeOwner,
+  validate: validateOwner,
+  notFoundMessage: "Responsable no encontrado",
+});
 
-export function ownerExists(id: string): boolean {
-  return owners.some((owner) => owner.id === id);
-}
+// Las mascotas viven en el backend y se vinculan al perfil autenticado, no a
+// estos responsables; por eso el contador se mantiene en 0.
+const withPetCount = (owner: Owner): OwnerWithPets => ({ ...owner, petCount: 0 });
 
-export async function getOwners(): Promise<OwnerWithPets[]> {
-  await delay();
-  return owners.map((owner) => withPetCount(owner));
-}
+export const ownersService = {
+  async list(): Promise<OwnerWithPets[]> {
+    return (await store.list()).map(withPetCount);
+  },
 
-export async function getOwnerById(
-  id: string,
-): Promise<OwnerWithPets | undefined> {
-  await delay();
-  const owner = owners.find((o) => o.id === id);
-  return owner && withPetCount(owner);
-}
+  async getById(id: string): Promise<OwnerWithPets | undefined> {
+    const owner = await store.getById(id);
+    return owner ? withPetCount(owner) : undefined;
+  },
 
-export async function createOwner(data: OwnerInput): Promise<Owner> {
-  await delay();
-  const values = normalizeOwner(data);
-  validateOwner(values);
-  const newOwner: Owner = { ...values, id: crypto.randomUUID() };
-  owners = [...owners, newOwner];
-  return newOwner;
-}
+  async create(data: OwnerInput): Promise<OwnerWithPets> {
+    return withPetCount(await store.create(data));
+  },
 
-export async function updateOwner(
-  id: string,
-  data: OwnerInput,
-): Promise<Owner> {
-  await delay();
-  const values = normalizeOwner(data);
-  validateOwner(values, id);
-  owners = owners.map((
-    owner,
-  ) => (owner.id === id ? { ...owner, ...values } : owner));
-  const updated = owners.find((owner) => owner.id === id);
-  if (!updated) throw new Error("Owner not found");
-  return updated;
-}
+  async update(id: string, data: OwnerInput): Promise<OwnerWithPets> {
+    return withPetCount(await store.update(id, data));
+  },
 
-export async function deleteOwner(id: string): Promise<void> {
-  await delay();
-  owners = owners.filter((owner) => owner.id !== id);
-}
+  remove: (id: string) => store.remove(id),
+};
