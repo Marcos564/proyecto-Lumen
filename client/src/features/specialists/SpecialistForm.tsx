@@ -3,7 +3,7 @@ import { Button } from "@shared/components/ui/Button";
 import { Field, inputClass } from "@shared/components/ui/Field";
 import type { SpecialistInput } from "@shared/types";
 
-interface SpecialistFormProps {
+export interface SpecialistFormProps {
   initialValues?: SpecialistInput;
   submitting?: boolean;
   onSubmit: (values: SpecialistInput) => void;

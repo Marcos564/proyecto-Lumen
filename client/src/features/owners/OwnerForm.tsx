@@ -3,7 +3,7 @@ import { Button } from "@shared/components/ui/Button";
 import { Field, inputClass } from "@shared/components/ui/Field";
 import type { OwnerInput } from "@shared/types";
 
-interface OwnerFormProps {
+export interface OwnerFormProps {
   initialValues?: OwnerInput;
   petCount?: number;
   error?: string;

@@ -1,10 +1,22 @@
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Tabs } from "@shared/components/ui/Tabs";
-import { usePet, useMedicalRecords } from "./hooks/usePets";
-import { PatientInfoTab } from "./components/PatientInfoTab";
-import { HistoryTable } from "./components/HistoryTable";
-import type { MedicalRecord } from "@shared/types/pets";
+import { PageHeader } from "@shared/components/ui/PageHeader";
+import { Skeleton } from "@shared/components/ui/Skeleton";
+import { CardsSkeleton, TableSkeleton } from "@shared/components/ui/Skeletons";
+import { lazyComponent } from "@shared/utils/lazyComponent";
+import { usePet } from "./hooks/usePets";
+
+// Tabs diferidas: la info se pide al abrir la ficha y la historia clínica
+// recién cuando el usuario entra a esa tab.
+const PatientInfoTab = lazyComponent(
+  "PatientInfoTab",
+  () => import("./components/PatientInfoTab"),
+);
+const MedicalHistoryTab = lazyComponent(
+  "MedicalHistoryTab",
+  () => import("./components/MedicalHistoryTab"),
+);
 
 const tabs = [
   { id: "info", label: "Info general" },
@@ -15,49 +27,39 @@ export function PatientDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState("info");
   const { data: patient, isLoading } = usePet(id);
-  const { data: medicalRecords = [], isLoading: isLoadingRecords } =
-    useMedicalRecords(patient?.id);
 
   if (isLoading) {
-    return <p className="text-sm text-slate-500">Cargando ficha...</p>;
+    return (
+      <div className="flex flex-col gap-6">
+        <Skeleton className="h-8 w-48" />
+        <CardsSkeleton />
+      </div>
+    );
   }
+
   if (!patient) {
     return <p className="text-sm text-slate-500">Mascota no encontrada.</p>;
   }
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-slate-800">
-          {patient.name}
-        </h1>
-        <p className="text-sm text-slate-500">
-          {patient.specie} · {patient.race}
-        </p>
-      </div>
+      <PageHeader
+        title={patient.name}
+        description={`${patient.specie} · ${patient.race}`}
+      />
 
       <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
-      {activeTab === "info" && <PatientInfoTab patient={patient} />}
+      {activeTab === "info" && (
+        <Suspense fallback={<CardsSkeleton />}>
+          <PatientInfoTab patient={patient} />
+        </Suspense>
+      )}
 
       {activeTab === "medical-records" && (
-        <HistoryTable<MedicalRecord>
-          rows={medicalRecords}
-          emptyMessage={isLoadingRecords
-            ? "Cargando historia clínica..."
-            : "No hay registros de historia clínica."}
-          columns={[
-            { header: "Registro", render: (r) => r.title },
-            {
-              header: "Temperatura",
-              render: (r) => `${r.temperature} °C`,
-            },
-            {
-              header: "Peso",
-              render: (r) => `${r.weight} kg`,
-            },
-          ]}
-        />
+        <Suspense fallback={<TableSkeleton rows={4} columns={3} />}>
+          <MedicalHistoryTab petId={patient.id} />
+        </Suspense>
       )}
     </div>
   );

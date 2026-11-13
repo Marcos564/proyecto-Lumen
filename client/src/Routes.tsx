@@ -5,41 +5,41 @@ import AuthLayout from "@layouts/AuthLayout";
 import { FallbackLoading } from "@shared/components/FallbackLoading";
 import { RequireAuth } from "@shared/components/RequireAuth";
 import { useAuth } from "@shared";
-import { lazyPage } from "@shared/utils/lazyPage";
+import { lazyComponent } from "@shared/utils/lazyComponent";
 
-const PatientsListPage = lazyPage(
+const PatientsListPage = lazyComponent(
   "PatientsListPage",
   () => import("@features/patients/PatientsListPage"),
 );
-const PatientDetailPage = lazyPage(
+const PatientDetailPage = lazyComponent(
   "PatientDetailPage",
   () => import("@features/patients/PatientDetailPage"),
 );
-const SpecialistsListPage = lazyPage(
+const SpecialistsListPage = lazyComponent(
   "SpecialistsListPage",
   () => import("@features/specialists/SpecialistsListPage"),
 );
-const AppointmentsPage = lazyPage(
+const AppointmentsPage = lazyComponent(
   "AppointmentsPage",
   () => import("@features/appointments/AppointmentsPage"),
 );
-const InventoryPage = lazyPage(
+const InventoryPage = lazyComponent(
   "InventoryPage",
   () => import("@features/inventory/InventoryPage"),
 );
-const OwnersListPage = lazyPage(
+const OwnersListPage = lazyComponent(
   "OwnersListPage",
   () => import("@features/owners/OwnersListPage"),
 );
-const LoginPage = lazyPage(
+const LoginPage = lazyComponent(
   "LoginPage",
   () => import("@features/auth/page/LoginPage"),
 );
-const LandingPage = lazyPage(
+const LandingPage = lazyComponent(
   "LandingPage",
   () => import("@features/landing/LandingPage"),
 );
-const ComponenteInfinito = lazyPage(
+const ComponenteInfinito = lazyComponent(
   "ComponenteInfinito",
   () => import("@shared/components/FallbackActive"),
 );

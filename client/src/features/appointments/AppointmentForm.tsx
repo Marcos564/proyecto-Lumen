@@ -5,7 +5,7 @@ import { isPastDateTime, nowDateTimeValue } from '@shared/utils/dateTime'
 import type { AppointmentInput, AppointmentStatus } from '@shared/types'
 import type { PetSummary } from '@shared/types/pets'
 
-interface AppointmentFormProps {
+export interface AppointmentFormProps {
   pets: PetSummary[]
   initialValues?: AppointmentInput
   error?: string

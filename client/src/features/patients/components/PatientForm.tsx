@@ -3,7 +3,7 @@ import { Button } from "@shared/components/ui/Button";
 import { Field, inputClass } from "@shared/components/ui/Field";
 import type { PetGender, PetInput, PetStatus, Race, Specie } from "@shared/types/pets";
 
-interface PatientFormProps {
+export interface PatientFormProps {
   species: Specie[];
   races: Race[];
   initialValues?: PetInput;

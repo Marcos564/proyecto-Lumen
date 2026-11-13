@@ -1,6 +1,7 @@
 import { Pencil, Trash2 } from "lucide-react";
 import { Table } from "@shared/components/ui/Table";
 import { IconButton } from "@shared/components/ui/IconButton";
+import { TableSkeleton } from "@shared/components/ui/Skeletons";
 import type { PetSummary } from "@shared/types/pets";
 import { PetStatusBadge } from "./PatientStatusBadge";
 
@@ -27,14 +28,16 @@ interface PatientsTableProps {
 export function PatientsTable(
   { pets, isLoading, onRowClick, onEdit, onDelete }: PatientsTableProps,
 ) {
+  if (isLoading) {
+    return <TableSkeleton rows={6} columns={5} />;
+  }
+
   return (
     <Table<PetSummary>
       data={pets}
       keyExtractor={(pet) => pet.id}
       onRowClick={onRowClick}
-      emptyMessage={isLoading
-        ? "Cargando mascotas..."
-        : "No se encontraron mascotas."}
+      emptyMessage="No se encontraron mascotas."
       columns={[
         {
           header: "Mascota",

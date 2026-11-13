@@ -3,7 +3,7 @@ import { Button } from "@shared/components/ui/Button";
 import { Field, inputClass } from "@shared/components/ui/Field";
 import type { InventoryCategory, InventoryItemInput } from "@shared/types";
 
-interface InventoryItemFormProps {
+export interface InventoryItemFormProps {
   initialValues?: InventoryItemInput;
   submitting?: boolean;
   onSubmit: (values: InventoryItemInput) => void;
