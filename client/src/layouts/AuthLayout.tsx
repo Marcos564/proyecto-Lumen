@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Outlet } from "react-router-dom";
 import { Link } from "@shared/components/ui/Link";
+import { ThemeToggle } from "@shared/components/ui/ThemeToggle";
 
 // Misma foto que el hero de la landing.
 const HERO_IMAGE =
@@ -95,13 +96,16 @@ export default function AuthLayout() {
           <span className="lg:invisible">
             <Logo />
           </span>
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-lumen-dark-500 transition-colors hover:text-lumen-600"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Volver al inicio
-          </Link>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-lumen-dark-500 transition-colors hover:text-lumen-600"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Volver al inicio
+            </Link>
+          </div>
         </div>
 
         <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center py-10">

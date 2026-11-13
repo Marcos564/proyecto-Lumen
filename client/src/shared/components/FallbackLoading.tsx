@@ -19,7 +19,7 @@ export function FallbackLoading({
   subtitle =
     "Por favor, espere un momento mientras verificamos las credenciales...",
   variant = "ring",
-  brandColor = "#00b4d8",
+  brandColor = "#f1883d",
   fullScreen = true,
   blurOverlay = false,
   showCard = true,

@@ -1,30 +1,490 @@
 @import "tailwindcss";
-@theme {
-  /* Color Principal (Verde Turquesa / Lumen Teal) */
-  --color-lumen-50: #f0fdfa;
-  --color-lumen-100: #ccfbf1;
-  --color-lumen-200: #99f6e4;
-  --color-lumen-300: #5eead4;
-  --color-lumen-400: #2dd4bf;
-  --color-lumen-500: #00a896;
-  --color-lumen-600: #008f80;
-  --color-lumen-700: #0f766e;
-  --color-lumen-800: #115e59;
-  --color-lumen-900: #134e4a;
-  --color-lumen-950: #042f2e;
 
-  --color-lumen-dark-50: #f4f5f8;
-  --color-lumen-dark-100: #e3e6ed;
-  --color-lumen-dark-200: #c5cbd9;
-  --color-lumen-dark-300: #9ca6be;
-  --color-lumen-dark-400: #7481a1;
-  --color-lumen-dark-500: #556387;
-  --color-lumen-dark-600: #424e70;
-  --color-lumen-dark-700: #363f5b;
-  --color-lumen-dark-800: #212739;
-  --color-lumen-dark-900: #0f1420;
-  --color-lumen-dark-950: #090c15;
+/* =========================================================================
+   Lumen · Tema base
+   Paleta: brand (naranja) · teal · ink (verde profundo) · cream
+   - Los colores quedan centralizados acá y se usan en toda la app a través
+     de las clases de Tailwind (bg-*, text-*, border-*, ...).
+   - Modo claro por defecto. El usuario cambia a oscuro con el botón, que
+     pone la clase .dark (o data-theme="dark") en <html>.
+   ========================================================================= */
+
+/* La variante `dark:` responde a la clase .dark en <html>. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* --- Marca · naranja --- */
+  --color-brand-50: #fdf3eb;
+  --color-brand-100: #fce7d8;
+  --color-brand-200: #f9cfb1;
+  --color-brand-300: #f6b78a;
+  --color-brand-400: #f39f63;
+  --color-brand-500: #f1883d;
+  --color-brand-600: #cc7333;
+  --color-brand-700: #a85f2a;
+  --color-brand-800: #844a21;
+  --color-brand-900: #603618;
+  --color-brand-950: #3c220f;
+
+  /* --- Teal --- */
+  --color-teal-50: #e5f5f5;
+  --color-teal-100: #ccebec;
+  --color-teal-200: #99d7da;
+  --color-teal-300: #66c3c8;
+  --color-teal-400: #33afb6;
+  --color-teal-500: #009ba4;
+  --color-teal-600: #00838b;
+  --color-teal-700: #006c72;
+  --color-teal-800: #00555a;
+  --color-teal-900: #003e41;
+  --color-teal-950: #002629;
+
+  /* --- Ink · verde profundo (neutrales) --- */
+  --color-ink-50: #f3f7f6;
+  --color-ink-100: #e2ecea;
+  --color-ink-200: #c5d9d5;
+  --color-ink-300: #9bbdb7;
+  --color-ink-400: #6a9a93;
+  --color-ink-500: #477d76;
+  --color-ink-600: #35645f;
+  --color-ink-700: #2b504d;
+  --color-ink-800: #1f3f3d;
+  --color-ink-900: #0b2b2e;
+  --color-ink-950: #061b1d;
+
+  /* --- Fondo crema --- */
+  --color-cream: #fbfaf7;
+
+  /* --- Compatibilidad con la paleta anterior --- */
+  --color-lumen-50: var(--color-brand-50);
+  --color-lumen-100: var(--color-brand-100);
+  --color-lumen-200: var(--color-brand-200);
+  --color-lumen-300: var(--color-brand-300);
+  --color-lumen-400: var(--color-brand-400);
+  --color-lumen-500: var(--color-brand-500);
+  --color-lumen-600: var(--color-brand-600);
+  --color-lumen-700: var(--color-brand-700);
+  --color-lumen-800: var(--color-brand-800);
+  --color-lumen-900: var(--color-brand-900);
+  --color-lumen-950: var(--color-brand-950);
+
+  --color-lumen-dark-50: var(--color-ink-50);
+  --color-lumen-dark-100: var(--color-ink-100);
+  --color-lumen-dark-200: var(--color-ink-200);
+  --color-lumen-dark-300: var(--color-ink-300);
+  --color-lumen-dark-400: var(--color-ink-400);
+  --color-lumen-dark-500: var(--color-ink-500);
+  --color-lumen-dark-600: var(--color-ink-600);
+  --color-lumen-dark-700: var(--color-ink-700);
+  --color-lumen-dark-800: var(--color-ink-800);
+  --color-lumen-dark-900: var(--color-ink-900);
+  --color-lumen-dark-950: var(--color-ink-950);
+
+  /* Los neutrales (slate) ahora usan la escala ink en modo claro.
+     El modo oscuro se resuelve más abajo con light-dark(). */
+  --color-slate-50: var(--color-ink-50);
+  --color-slate-100: var(--color-ink-100);
+  --color-slate-200: var(--color-ink-200);
+  --color-slate-300: var(--color-ink-300);
+  --color-slate-400: var(--color-ink-400);
+  --color-slate-500: var(--color-ink-500);
+  --color-slate-600: var(--color-ink-600);
+  --color-slate-700: var(--color-ink-700);
+  --color-slate-800: var(--color-ink-800);
+  --color-slate-900: var(--color-ink-900);
+  --color-slate-950: var(--color-ink-950);
+
+  /* gray y cyan se alinean a la paleta (gris → ink, cyan → teal) */
+  --color-gray-50: var(--color-slate-50);
+  --color-gray-100: var(--color-slate-100);
+  --color-gray-200: var(--color-slate-200);
+  --color-gray-300: var(--color-slate-300);
+  --color-gray-400: var(--color-slate-400);
+  --color-gray-500: var(--color-slate-500);
+  --color-gray-600: var(--color-slate-600);
+  --color-gray-700: var(--color-slate-700);
+  --color-gray-800: var(--color-slate-800);
+  --color-gray-900: var(--color-slate-900);
+  --color-gray-950: var(--color-slate-950);
+
+  --color-cyan-50: var(--color-teal-50);
+  --color-cyan-100: var(--color-teal-100);
+  --color-cyan-200: var(--color-teal-200);
+  --color-cyan-300: var(--color-teal-300);
+  --color-cyan-400: var(--color-teal-400);
+  --color-cyan-500: var(--color-teal-500);
+  --color-cyan-600: var(--color-teal-600);
+  --color-cyan-700: var(--color-teal-700);
+  --color-cyan-800: var(--color-teal-800);
+  --color-cyan-900: var(--color-teal-900);
+  --color-cyan-950: var(--color-teal-950);
 }
+
+/* =========================================================================
+   Modo claro / oscuro
+   light-dark() elige el color según el `color-scheme` activo.
+   Arranca en claro; el botón de tema alterna la clase .dark en <html>.
+   ========================================================================= */
+:root {
+  color-scheme: light;
+}
+
+/* Manual: <html class="dark"> o <html data-theme="dark"> */
+:root.dark,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+:root.light,
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+/* Neutrales que cambian de claro a oscuro.
+   Guardado con @supports para no romper navegadores sin light-dark(). */
+@supports (color: light-dark(#000, #fff)) {
+  :root {
+    --color-slate-50: light-dark(var(--color-cream), var(--color-ink-950));
+    --color-slate-100: light-dark(var(--color-ink-100), var(--color-ink-700));
+    --color-slate-200: light-dark(var(--color-ink-200), var(--color-ink-600));
+    --color-slate-300: light-dark(var(--color-ink-300), var(--color-ink-500));
+    --color-slate-500: light-dark(var(--color-ink-500), var(--color-ink-300));
+    --color-slate-600: light-dark(var(--color-ink-600), var(--color-ink-200));
+    --color-slate-700: light-dark(var(--color-ink-700), var(--color-ink-100));
+    --color-slate-800: light-dark(var(--color-ink-800), var(--color-ink-50));
+    --color-slate-900: light-dark(var(--color-ink-900), var(--color-ink-950));
+  }
+}
+
+/* =========================================================================
+   Base
+   ========================================================================= */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
+  min-height: 100vh;
+  background-color: var(--color-cream);
+  background-color: light-dark(var(--color-cream), var(--color-ink-950));
+  color: var(--color-ink-700);
+  color: light-dark(var(--color-ink-700), var(--color-ink-100));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: color-mix(in oklab, var(--color-brand-500) 35%, transparent);
+}
+
+/* Transición suave al cambiar de tema.
+   La clase .theme-transition se agrega temporalmente desde el botón. */
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+  transition:
+    background-color 320ms ease,
+    border-color 320ms ease,
+    color 320ms ease,
+    fill 320ms ease,
+    stroke 320ms ease,
+    box-shadow 320ms ease,
+    opacity 320ms ease,
+    transform 320ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-transition,
+  .theme-transition *,
+  .theme-transition *::before,
+  .theme-transition *::after {
+    transition: none;
+  }
+}
+
+/* =========================================================================
+   Componentes del tema
+   ========================================================================= */
+
+/* Barra lateral: blanca de día, verde profundo de noche. */
+.app-sidebar {
+  background-color: light-dark(#ffffff, var(--color-ink-900));
+  border-color: light-dark(var(--color-ink-200), var(--color-ink-800));
+}
+
+/* Botón de tema: círculo blanco de día y negro de noche. */
+.theme-toggle {
+  background-color: light-dark(#ffffff, #000000);
+  border-color: light-dark(var(--color-ink-200), var(--color-ink-700));
+  color: light-dark(var(--color-ink-700), var(--color-brand-300));
+  box-shadow:
+    0 1px 2px light-dark(rgb(6 27 29 / 0.12), rgb(0 0 0 / 0.55)),
+    0 4px 12px light-dark(rgb(6 27 29 / 0.08), rgb(0 0 0 / 0.4));
+}
+
+.theme-toggle:hover {
+  background-color: light-dark(var(--color-brand-50), var(--color-ink-900));
+  border-color: light-dark(var(--color-brand-300), var(--color-brand-500));
+  color: light-dark(var(--color-brand-700), var(--color-brand-200));
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--color-teal-500);
+  outline-offset: 2px;
+}
+
+/* =========================================================================
+   Ajustes finos de modo oscuro
+   (casos donde un mismo color se usa como fondo y como texto)
+   ========================================================================= */
+
+/* Superficies blancas → superficie elevada oscura */
+.bg-white {
+  background-color: light-dark(#ffffff, var(--color-ink-800));
+}
+.odd\:bg-white:nth-child(odd) {
+  background-color: light-dark(#ffffff, var(--color-ink-800));
+}
+.even\:bg-slate-50:nth-child(2n) {
+  background-color: light-dark(var(--color-cream), var(--color-ink-900));
+}
+.bg-white\/90 {
+  background-color: light-dark(
+    color-mix(in oklab, #ffffff 90%, transparent),
+    color-mix(in oklab, var(--color-ink-800) 90%, transparent)
+  );
+}
+.bg-white\/95 {
+  background-color: light-dark(
+    color-mix(in oklab, #ffffff 95%, transparent),
+    color-mix(in oklab, var(--color-ink-800) 95%, transparent)
+  );
+}
+.focus\:bg-white:focus {
+  background-color: light-dark(#ffffff, var(--color-ink-700));
+}
+.from-white {
+  --tw-gradient-from: light-dark(#ffffff, var(--color-ink-950));
+}
+.border-white {
+  border-color: light-dark(#ffffff, var(--color-ink-700));
+}
+
+/* Degradados de la landing/auth que arrancan en blanco */
+.via-lumen-50\/40 {
+  --tw-gradient-via: light-dark(
+    color-mix(in oklab, var(--color-brand-50) 40%, transparent),
+    color-mix(in oklab, var(--color-brand-500) 14%, transparent)
+  );
+}
+.to-cyan-50\/30 {
+  --tw-gradient-to: light-dark(
+    color-mix(in oklab, var(--color-teal-50) 30%, transparent),
+    color-mix(in oklab, var(--color-teal-500) 12%, transparent)
+  );
+}
+
+/* Sidebar y paneles que son oscuros en ambos modos */
+.bg-slate-700 {
+  background-color: var(--color-ink-700);
+}
+.bg-slate-800 {
+  background-color: var(--color-ink-800);
+}
+.bg-slate-800\/80 {
+  background-color: color-mix(in oklab, var(--color-ink-800) 80%, transparent);
+}
+.border-slate-700 {
+  border-color: var(--color-ink-700);
+}
+.border-slate-800 {
+  border-color: var(--color-ink-800);
+}
+.border-slate-800\/80 {
+  border-color: color-mix(in oklab, var(--color-ink-800) 80%, transparent);
+}
+.text-slate-100 {
+  color: var(--color-ink-100);
+}
+.text-slate-200 {
+  color: var(--color-ink-200);
+}
+.text-slate-300 {
+  color: var(--color-ink-300);
+}
+.text-slate-900 {
+  color: light-dark(var(--color-ink-900), var(--color-ink-50));
+}
+.text-gray-900 {
+  color: light-dark(var(--color-ink-900), var(--color-ink-50));
+}
+.hover\:bg-slate-700:hover {
+  background-color: var(--color-ink-700);
+}
+.hover\:bg-slate-800:hover {
+  background-color: var(--color-ink-800);
+}
+
+/* Fondos de acento claros → acento translúcido sobre oscuro */
+.bg-teal-50 {
+  background-color: light-dark(
+    var(--color-teal-50),
+    color-mix(in oklab, var(--color-teal-500) 16%, transparent)
+  );
+}
+.bg-teal-100 {
+  background-color: light-dark(
+    var(--color-teal-100),
+    color-mix(in oklab, var(--color-teal-500) 22%, transparent)
+  );
+}
+.hover\:bg-teal-50:hover {
+  background-color: light-dark(
+    var(--color-teal-50),
+    color-mix(in oklab, var(--color-teal-500) 16%, transparent)
+  );
+}
+.bg-lumen-50 {
+  background-color: light-dark(
+    var(--color-brand-50),
+    color-mix(in oklab, var(--color-brand-500) 16%, var(--color-ink-900))
+  );
+}
+.hover\:bg-lumen-50:hover {
+  background-color: light-dark(
+    var(--color-brand-50),
+    color-mix(in oklab, var(--color-brand-500) 16%, transparent)
+  );
+}
+.bg-red-50 {
+  background-color: light-dark(
+    var(--color-red-50),
+    color-mix(in oklab, var(--color-red-500) 16%, transparent)
+  );
+}
+.bg-red-100 {
+  background-color: light-dark(
+    var(--color-red-100),
+    color-mix(in oklab, var(--color-red-500) 22%, transparent)
+  );
+}
+.hover\:bg-red-50:hover {
+  background-color: light-dark(
+    var(--color-red-50),
+    color-mix(in oklab, var(--color-red-500) 16%, transparent)
+  );
+}
+.hover\:bg-red-100:hover {
+  background-color: light-dark(
+    var(--color-red-100),
+    color-mix(in oklab, var(--color-red-500) 22%, transparent)
+  );
+}
+.bg-amber-100 {
+  background-color: light-dark(
+    var(--color-amber-100),
+    color-mix(in oklab, var(--color-amber-500) 22%, transparent)
+  );
+}
+.bg-emerald-100 {
+  background-color: light-dark(
+    var(--color-emerald-100),
+    color-mix(in oklab, var(--color-emerald-500) 22%, transparent)
+  );
+}
+
+/* Textos de acento: se aclaran para mantener contraste en oscuro */
+.text-teal-500 {
+  color: light-dark(var(--color-teal-500), var(--color-teal-300));
+}
+.text-teal-600 {
+  color: light-dark(var(--color-teal-600), var(--color-teal-300));
+}
+.text-teal-600\/70 {
+  color: light-dark(
+    color-mix(in oklab, var(--color-teal-600) 70%, transparent),
+    color-mix(in oklab, var(--color-teal-300) 80%, transparent)
+  );
+}
+.text-teal-700 {
+  color: light-dark(var(--color-teal-700), var(--color-teal-200));
+}
+.hover\:text-teal-700:hover {
+  color: light-dark(var(--color-teal-700), var(--color-teal-200));
+}
+.text-lumen-400 {
+  color: light-dark(var(--color-brand-400), var(--color-brand-300));
+}
+.text-lumen-500 {
+  color: light-dark(var(--color-brand-500), var(--color-brand-300));
+}
+.text-lumen-600 {
+  color: light-dark(var(--color-brand-600), var(--color-brand-300));
+}
+.text-lumen-700 {
+  color: light-dark(var(--color-brand-700), var(--color-brand-200));
+}
+.hover\:text-lumen-600:hover {
+  color: light-dark(var(--color-brand-600), var(--color-brand-300));
+}
+.text-lumen-dark-500 {
+  color: light-dark(var(--color-ink-500), var(--color-ink-300));
+}
+.text-lumen-dark-600 {
+  color: light-dark(var(--color-ink-600), var(--color-ink-200));
+}
+.text-lumen-dark-700 {
+  color: light-dark(var(--color-ink-700), var(--color-ink-100));
+}
+.text-lumen-dark-800 {
+  color: light-dark(var(--color-ink-800), var(--color-ink-50));
+}
+.text-lumen-dark-900 {
+  color: light-dark(var(--color-ink-900), var(--color-ink-50));
+}
+.text-red-500 {
+  color: light-dark(var(--color-red-500), var(--color-red-400));
+}
+.text-red-600 {
+  color: light-dark(var(--color-red-600), var(--color-red-300));
+}
+.text-red-700 {
+  color: light-dark(var(--color-red-700), var(--color-red-300));
+}
+.hover\:text-red-600:hover {
+  color: light-dark(var(--color-red-600), var(--color-red-300));
+}
+.text-amber-600 {
+  color: light-dark(var(--color-amber-600), var(--color-amber-300));
+}
+.text-amber-700 {
+  color: light-dark(var(--color-amber-700), var(--color-amber-300));
+}
+.text-emerald-600 {
+  color: light-dark(var(--color-emerald-600), var(--color-emerald-300));
+}
+.text-emerald-700 {
+  color: light-dark(var(--color-emerald-700), var(--color-emerald-300));
+}
+.hover\:text-slate-600:hover {
+  color: light-dark(var(--color-ink-600), var(--color-ink-200));
+}
+.hover\:text-slate-700:hover {
+  color: light-dark(var(--color-ink-700), var(--color-ink-100));
+}
+.hover\:text-gray-600:hover {
+  color: light-dark(var(--color-ink-600), var(--color-ink-200));
+}
+.hover\:text-gray-900:hover {
+  color: light-dark(var(--color-ink-900), var(--color-ink-50));
+}
+
+/* Borde sutil de las tablas */
+.ring-slate-900\/5 {
+  --tw-ring-color: light-dark(
+    color-mix(in oklab, var(--color-ink-900) 5%, transparent),
+    color-mix(in oklab, var(--color-ink-50) 10%, transparent)
+  );
 }

@@ -14,6 +14,7 @@ import {
   Users,
 } from "lucide-react";
 import { Link } from "@shared/components/ui/Link";
+import { ThemeToggle } from "@shared/components/ui/ThemeToggle";
 
 // Fotos de ejemplo (Unsplash). Reemplazar por imágenes propias en /public cuando las haya.
 const IMAGES = {
@@ -237,6 +238,7 @@ export function LandingPage(): JSX.Element {
           </nav>
 
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <a
               href="#funciones"
               onClick={scrollToHash}

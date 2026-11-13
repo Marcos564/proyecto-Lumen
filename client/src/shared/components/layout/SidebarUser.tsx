@@ -23,19 +23,18 @@ export function SidebarUser() {
   return (
     <div
       ref={containerRef}
-      className="relative mt-4 border-t border-slate-800 pt-4"
+      className="relative mt-4 border-t border-slate-200 pt-4"
     >
       {menuOpen && (
-        <div className="group flex flex-col gap-0.5 absolute rounded-xl bottom-full left-0 right-0 mb-2 overflow-hidden border border-slate-700 bg-slate-800">
+        <div className="group flex flex-col gap-0.5 absolute rounded-xl bottom-full left-0 right-0 mb-2 overflow-hidden border border-slate-200 bg-white shadow-lg">
           {isAuthenticated
             ? (
-              <Button
-                type="button"
+              <Button variant="ghost" type="button"
                 onClick={() => {
                   signOut();
                   setMenuOpen(false);
                 }}
-                className="rounded-none w-full items-center text-sm text-slate-200 hover:bg-slate-700 hover:text-white"
+                className="rounded-none w-full items-center text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900"
               >
                 <LogOut className="h-4 w-4" />
                 Cerrar sesión
@@ -43,32 +42,32 @@ export function SidebarUser() {
             )
             : (
               <>
-                <Button
+                <Button variant="ghost"
                   type="button"
                   onClick={() => {
                     setMenuOpen(false);
                   }}
-                  className="rounded-none w-full items-center text-sm text-slate-200 hover:bg-slate-700 hover:text-white"
+                  className="rounded-none w-full items-center text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                 >
                   <LogIn className="h-4 w-4" />
                   <Link
                     to="/auth/login"
-                    className="text-slate-200 hover:text-white"
+                    className="text-slate-700 hover:text-slate-900"
                   >
                     Registrarse
                   </Link>
                 </Button>
-                <Button
+                <Button variant="ghost"
                   type="button"
                   onClick={() => {
                     setMenuOpen(false);
                   }}
-                  className="rounded-none w-full items-center text-sm text-slate-200 hover:bg-slate-700 hover:text-white"
+                  className="rounded-none w-full items-center text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                 >
                   <LogIn className="h-4 w-4" />
                   <Link
                     to="/auth/login"
-                    className="text-slate-200 hover:text-white"
+                    className="text-slate-700 hover:text-slate-900"
                   >
                     Iniciar sesión
                   </Link>
@@ -81,16 +80,16 @@ export function SidebarUser() {
       <button
         type="button"
         onClick={() => setMenuOpen((open) => !open)}
-        className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-slate-800"
+        className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-slate-100"
       >
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-700 text-slate-200">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600">
           <User className="h-5 w-5" />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-medium text-white">
+          <span className="block truncate text-sm font-medium text-slate-800">
             {user?.fullName ||  jwtPayload?.unique_name || "Invitado"}
           </span>
-          <span className="block truncate text-xs text-slate-400">
+          <span className="block truncate text-xs text-slate-500">
             {jwtPayload
               ? jwtPayload
                 ?.[

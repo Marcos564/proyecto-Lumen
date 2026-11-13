@@ -4,7 +4,7 @@ interface PulseSpinnerProps {
 }
 
 export const PulseSpinner = (
-  { color = "#00b4d8", size = 52 }: PulseSpinnerProps,
+  { color = "#f1883d", size = 52 }: PulseSpinnerProps,
 ) => (
   <div
     className="relative flex items-center justify-center"
@@ -18,7 +18,7 @@ export const PulseSpinner = (
 
     {/* Central SVG Container */}
     <div
-      className="relative flex items-center justify-center rounded-full p-3 shadow-md bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700"
+      className="relative flex items-center justify-center rounded-full p-3 shadow-md bg-white border border-slate-100"
       style={{ width: size, height: size }}
     >
       <svg

@@ -1,10 +1,26 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lumen</title>
+    <script>
+      // Aplica el tema antes de pintar para evitar destellos.
+      // Por defecto arranca en claro; si el usuario ya eligió, respeta su elección.
+      (function () {
+        try {
+          var stored = localStorage.getItem("@lumen:theme");
+          var theme = stored === "dark" ? "dark" : "light";
+          var root = document.documentElement;
+          root.classList.add(theme);
+          root.dataset.theme = theme;
+          root.style.colorScheme = theme;
+        } catch (error) {
+          /* sin localStorage: se queda en claro */
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
