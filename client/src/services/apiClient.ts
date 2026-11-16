@@ -1,14 +1,18 @@
 import axios from "axios";
+import { getConfig } from "../shared/config/configEnv";
 
-/**
- * Cliente HTTP ya configurado para el día que exista la API real en C# / ASP.NET Core.
- * Todavía no se usa: los services/*.service.ts resuelven contra mocks en memoria.
- * Cuando la API exista, alcanza con reemplazar el cuerpo de esos services por
- * llamadas a este `apiClient` y setear VITE_API_BASE_URL.
- */
+// Se conserva el cliente HTTP preparado para la API real.
+// La URL se obtiene desde la configuración centralizada,
+// evitando definir otro valor predeterminado independiente.
+
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? "",
   headers: {
     "Content-Type": "application/json",
   },
+});
+
+apiClient.interceptors.request.use(async (config) => {
+  const envConfig = await getConfig();
+  config.baseURL = envConfig.getUrl();
+  return config;
 });
