@@ -80,7 +80,7 @@ const LandingPage = lazy(() =>
 function HomeRoute() {
   const { isAuthenticated } = useAuth();
   return isAuthenticated
-    ? <Navigate to="/pacientes" replace />
+    ? <Navigate to="/pets" replace />
     : <LandingPage />;
 }
 export const Routes = createBrowserRouter([
@@ -106,7 +106,7 @@ export const Routes = createBrowserRouter([
         index: true,
       },
       {
-        path: "pacientes",
+        path: "pets",
         element: (
           <Suspense fallback={<FallbackLoading />}>
             <PatientsListPage />
@@ -114,7 +114,7 @@ export const Routes = createBrowserRouter([
         ),
       },
       {
-        path: "pacientes/:id",
+        path: "pets/:id",
         element: (
           <Suspense fallback={<FallbackLoading />}>
             <PatientDetailPage />
@@ -122,11 +122,11 @@ export const Routes = createBrowserRouter([
         ),
       },
       {
-        path: "duenos",
+        path: "owners",
         element: (
                     /*
           <Suspense fallback={<FallbackLoading />}>
-            <SpecialistsListPage />
+            <OwnersListPage />
           </Suspense>
           */
 
@@ -140,7 +140,7 @@ export const Routes = createBrowserRouter([
         ),
       },
       {
-        path: "turnos",
+        path: "appointments",
         element: (
           <Suspense fallback={<FallbackLoading />}>
             <AppointmentsPage />
@@ -148,7 +148,7 @@ export const Routes = createBrowserRouter([
         ),
       },
       {
-        path: "inventario",
+        path: "stock",
         element: (
           <Suspense fallback={<FallbackLoading />}>
             <InventoryPage />
@@ -156,7 +156,7 @@ export const Routes = createBrowserRouter([
         ),
       },
       {
-        path: "especialistas",
+        path: "staff",
         element: (
           <Suspense fallback={<FallbackLoading />}>
             <SpecialistsListPage />
@@ -164,7 +164,7 @@ export const Routes = createBrowserRouter([
         ),
       },
       {
-        path: "propietarios",
+        path: "owners",
         element: (
           <Suspense fallback={<FallbackLoading />}>
             <OwnersListPage />

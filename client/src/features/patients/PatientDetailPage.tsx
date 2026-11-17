@@ -34,7 +34,7 @@ export function PatientDetailPage() {
           {patient.name}
         </h1>
         <p className="text-sm text-slate-500">
-          {patient.species} · {patient.breed} · Dueño:{" "}
+          {patient.species} · {patient.breed} · Responsable:{" "}
           {owner ? ownerFullName(owner) : "—"}
         </p>
       </div>

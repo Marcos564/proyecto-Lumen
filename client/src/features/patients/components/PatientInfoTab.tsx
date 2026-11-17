@@ -32,7 +32,7 @@ export function PatientInfoTab({ patient, owner }: PatientInfoTabProps) {
       </Card>
 
       <Card className="flex flex-col gap-4">
-        <SectionTitle icon={User} title="Dueño" />
+        <SectionTitle icon={User} title="Responsable" />
         {owner
           ? (
             <div className="grid grid-cols-2 gap-4">
@@ -46,7 +46,7 @@ export function PatientInfoTab({ patient, owner }: PatientInfoTabProps) {
           )
           : (
             <p className="text-sm text-slate-400">
-              Cargando datos del dueño...
+              Cargando datos del responsable...
             </p>
           )}
       </Card>

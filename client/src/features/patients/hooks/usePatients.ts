@@ -36,7 +36,7 @@ function useInvalidatePatients() {
   const queryClient = useQueryClient();
   return () => {
     queryClient.invalidateQueries({ queryKey: patientKeys.all });
-    // La cantidad de mascotas de cada dueño depende de los pacientes.
+    // La cantidad de mascotas de cada responsable depende de los pacientes.
     queryClient.invalidateQueries({ queryKey: ownerKeys.all });
   };
 }

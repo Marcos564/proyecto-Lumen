@@ -9,7 +9,7 @@ export type PatientInput = Omit<Patient, "id" | "treatments" | "vaccines">;
 
 function assertOwnerExists(ownerId: string) {
   if (!ownerExists(ownerId)) {
-    throw new Error("El dueño seleccionado no existe.");
+    throw new Error("El responsable seleccionado no existe.");
   }
 }
 

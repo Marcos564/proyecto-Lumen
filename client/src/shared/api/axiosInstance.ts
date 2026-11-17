@@ -1,9 +1,8 @@
 import axios from "axios";
-//import { getConfig } from "../index.ts";
-import { getConfig } from "../config/configEnv"; // Importa la función getConfig desde el archivo configEnv.ts para evitar dependencias circulares.
+import { getConfig, tokenKey } from "../index.ts";
 
 const instance = axios.create({
-  withCredentials: false,
+  withCredentials: true,
 });
 
 
@@ -28,7 +27,7 @@ instance.interceptors.request.use(async (config) => {
 
 instance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem(tokenKey);
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -49,7 +48,7 @@ instance.interceptors.response.use(
         localStorage.clear();
         location.href = "/login";
       } else {
-        localStorage.removeItem("token");
+        localStorage.removeItem(tokenKey);
       }
     }
 

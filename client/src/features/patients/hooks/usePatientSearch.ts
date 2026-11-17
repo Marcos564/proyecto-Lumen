@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import type { Owner, Patient } from "../../../types";
 import { ownerFullName } from "../../owners/ownerFullName";
 
-// Filtra por nombre de la mascota, nombre del dueño o DNI del dueño.
+// Filtra por nombre de la mascota, nombre del responsable o DNI del responsable.
 export function filterPatients(
   patients: Patient[],
   ownersById: Map<string, Owner>,
