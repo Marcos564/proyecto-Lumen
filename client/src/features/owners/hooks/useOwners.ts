@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ownersService } from "@shared/services/owners.service";
+import { ownersService } from "@shared/services/ownersService";
 import type { OwnerInput } from "@shared/types";
 
 // Claves de caché para responsables. Usarlas siempre desde acá para que las

@@ -1,13 +1,13 @@
 import { isAxiosError } from "axios";
-import { instance } from "../api/axiosInstance";
-import type { AppointmentResponse } from "../api/dtos";
+import { instance } from "@shared/api/axiosInstance";
+import type { AppointmentResponse } from "@shared/api/dtos";
 import {
   fromApiAppointment,
   toCreateAppointmentBody,
   toUpdateAppointmentBody,
-} from "../api/mappers/appointments";
-import { toApiError, unwrap } from "../api/request";
-import type { Appointment, AppointmentInput, AppointmentStatus } from "../types";
+} from "@shared/api/mappers/appointments";
+import { toApiError, unwrap } from "@shared/api/request";
+import type { Appointment, AppointmentInput, AppointmentStatus } from "@shared/types";
 
 /*
  * Acceso HTTP a /api/appointment (LumenBackend.API).
@@ -18,7 +18,8 @@ import type { Appointment, AppointmentInput, AppointmentStatus } from "../types"
  * - PUT    /api/appointment/{id}  edición (204, sin cuerpo)
  * - DELETE /api/appointment/{id}  baja (204, sin cuerpo)
  *
- * El estado se deriva de `finishedDate` (ver api/mappers/appointments.ts).
+ * El servicio vive dentro de la feature para que Turnos sea dueño de su acceso
+ * a datos. El estado se deriva de `finishedDate` (ver api/mappers/appointments.ts).
  */
 
 // La UI todavía no pagina: se pide un lote grande en una sola llamada.

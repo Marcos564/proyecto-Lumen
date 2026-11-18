@@ -1,5 +1,5 @@
 import { useCrudResource } from "@shared/hooks/useCrudResource";
-import { specialistsService } from "@shared/services/specialists.service";
+import { specialistsService } from "@shared/services/specialistsService";
 
 export const specialistKeys = {
   all: ["specialists"] as const,

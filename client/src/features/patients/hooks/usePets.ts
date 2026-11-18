@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { petService } from "@shared/services/pets.service";
+import { petsService } from "@shared/services/petsService";
 import type { PetInput, PetUpdateInput } from "@shared/types/pets";
 
 /*
@@ -17,13 +17,13 @@ export const petKeys = {
 // el backend vincula cada mascota con el perfil del usuario autenticado.
 
 export function usePets() {
-  return useQuery({ queryKey: petKeys.all, queryFn: petService.getPets });
+  return useQuery({ queryKey: petKeys.all, queryFn: petsService.getPets });
 }
 
 export function usePet(id: string | undefined) {
   return useQuery({
     queryKey: petKeys.detail(id ?? ""),
-    queryFn: () => petService.getPet(id as string),
+    queryFn: () => petsService.getPet(id as string),
     enabled: Boolean(id),
   });
 }
@@ -31,7 +31,7 @@ export function usePet(id: string | undefined) {
 export function useMedicalRecords(petId: string | undefined) {
   return useQuery({
     queryKey: petKeys.medicalRecords(petId ?? ""),
-    queryFn: () => petService.getMedicalRecords(petId as string),
+    queryFn: () => petsService.getMedicalRecords(petId as string),
     enabled: Boolean(petId),
   });
 }
@@ -44,7 +44,7 @@ function useInvalidatePets() {
 export function useCreatePet() {
   const invalidate = useInvalidatePets();
   return useMutation({
-    mutationFn: (data: PetInput) => petService.createPet(data),
+    mutationFn: (data: PetInput) => petsService.createPet(data),
     onSuccess: invalidate,
   });
 }
@@ -53,7 +53,7 @@ export function useUpdatePet() {
   const invalidate = useInvalidatePets();
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: PetUpdateInput }) =>
-      petService.updatePet(id, data),
+      petsService.updatePet(id, data),
     onSuccess: invalidate,
   });
 }
@@ -61,7 +61,7 @@ export function useUpdatePet() {
 export function useDeletePet() {
   const invalidate = useInvalidatePets();
   return useMutation({
-    mutationFn: (id: string) => petService.deletePet(id),
+    mutationFn: (id: string) => petsService.deletePet(id),
     onSuccess: invalidate,
   });
 }

@@ -33,7 +33,7 @@ function isNotFound(error: unknown): boolean {
   return isAxiosError(error) && error.response?.status === 404;
 }
 
-export const petService = {
+export const petsService = {
   async getPets(): Promise<PetSummary[]> {
     try {
       return await unwrap<PetSummary[]>(

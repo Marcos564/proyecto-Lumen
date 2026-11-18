@@ -1,5 +1,5 @@
 import { useCrudResource } from "@shared/hooks/useCrudResource";
-import { inventoryService } from "@shared/services/inventory.service";
+import { inventoryService } from "@shared/services/inventoryService";
 
 export const inventoryKeys = {
   all: ["inventory"] as const,

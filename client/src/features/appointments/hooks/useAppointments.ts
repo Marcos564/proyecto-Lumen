@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useCrudResource } from "@shared/hooks/useCrudResource";
-import { appointmentsService } from "@shared/services/appointments.service";
+import { appointmentsService } from "../services/appointmentsService";
 import type { AppointmentStatus } from "@shared/types";
 
 export const appointmentKeys = {
