@@ -1,9 +1,10 @@
-import { useState } from 'react'
-import { Button } from '@shared/components/ui/Button'
-import { Field, inputClass } from '@shared/components/ui/Field'
-import { isPastDateTime, nowDateTimeValue } from '@shared/utils/dateTime'
-import type { AppointmentInput, AppointmentStatus } from '@shared/types'
-import type { PetSummary } from '@shared/types/pets'
+import { useState } from "react";
+import { Button } from "@shared/components/ui/Button";
+import { ClockTimePicker } from "@shared/components/ui/ClockTimePicker";
+import { Field, inputClass } from "@shared/components/ui/Field";
+import { isPastDateTime, nowDateTimeValue } from "@shared/utils/dateTime";
+import type { AppointmentInput, AppointmentStatus } from "@shared/types";
+import type { PetSummary } from "@shared/types/pets";
 
 export interface AppointmentFormProps {
   pets: PetSummary[]
@@ -22,39 +23,33 @@ function buildEmptyValues(pets: PetSummary[]): AppointmentInput {
   };
 }
 
-const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'))
-// Los turnos se agendan cada 5 minutos: 60 opciones sueltas eran imposibles de recorrer.
-const minutes = Array.from({ length: 12 }, (_, i) => String(i * 5).padStart(2, '0'))
-const lastMinute = minutes[minutes.length - 1]
+const DATE_TIME_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
 
 export function AppointmentForm({ pets, initialValues, error, submitting, onSubmit }: AppointmentFormProps) {
   const [values, setValues] = useState<AppointmentInput>(initialValues ?? buildEmptyValues(pets))
   const [pastDateError, setPastDateError] = useState('')
 
-  // La fecha se guarda como "YYYY-MM-DDTHH:mm" (24 h); se edita en partes para no depender del formato AM/PM del navegador.
+  // La fecha se guarda como "YYYY-MM-DDTHH:mm" (24 h); la hora se elige en el
+  // reloj y la fecha con el input nativo, así no dependemos del formato local.
   const [datePart = "", timePart = ""] = values.date.split("T");
-  const [hourPart = "", minutePart = ""] = timePart.split(":");
 
-  // Un turno nuevo no puede quedar en el pasado. Al editar uno existente no se restringe,
-  // porque los turnos ya pasados tienen que poder seguir corrigiéndose.
   const isEditing = Boolean(initialValues)
   const now = nowDateTimeValue()
-  const [today, nowTime] = now.split('T')
-  const [nowHour, nowMinute] = nowTime.split(':')
+  const [today, currentTime] = now.split('T')
   const isToday = !isEditing && datePart === today
-
-  // Un turno ya cargado puede tener minutos fuera de la grilla de a 5 (p. ej. 17:03): se agrega su valor para no perderlo al editar.
-  const minuteOptions = minutePart && !minutes.includes(minutePart) ? [...minutes, minutePart].sort() : minutes
-  // Una hora de hoy se descarta cuando ya no queda ningún minuto seleccionable dentro de ella.
-  const isHourPast = (hour: string) => isToday && `${hour}:${lastMinute}` < nowTime
 
   function handleChange<K extends keyof AppointmentInput>(field: K, value: AppointmentInput[K]) {
     setValues((prev) => ({ ...prev, [field]: value }))
   }
 
-  function handleDateTimeChange(date: string, hour: string, minute: string) {
+  function handleDateChange(date: string) {
     setPastDateError('')
-    handleChange('date', `${date}T${hour}:${minute}`)
+    handleChange('date', `${date}T${timePart}`)
+  }
+
+  function handleTimeChange(time: string) {
+    setPastDateError('')
+    handleChange('date', `${datePart || today}T${time}`)
   }
 
   return (
@@ -63,6 +58,10 @@ export function AppointmentForm({ pets, initialValues, error, submitting, onSubm
       onSubmit={(e) => {
         e.preventDefault()
         // Se vuelve a leer la hora actual al enviar: el modal pudo quedar abierto un rato.
+        if (!DATE_TIME_PATTERN.test(values.date)) {
+          setPastDateError('Elegí la fecha y la hora del turno.')
+          return
+        }
         if (!isEditing && isPastDateTime(values.date)) {
           setPastDateError('El turno no puede quedar en una fecha u hora que ya pasó.')
           return
@@ -92,49 +91,22 @@ export function AppointmentForm({ pets, initialValues, error, submitting, onSubm
             className={inputClass}
             value={datePart}
             min={isEditing ? undefined : today}
-            onChange={(e) => handleDateTimeChange(e.target.value, hourPart, minutePart)}
+            onChange={(e) => handleDateChange(e.target.value)}
             required
           />
         </Field>
-        <Field label="Hora (24 h)">
-          <div className="flex items-center gap-2">
-            <select
-              aria-label="Hora"
-              className={inputClass}
-              value={hourPart}
-              onChange={(e) =>
-                handleDateTimeChange(datePart, e.target.value, minutePart)}
-              required
-            >
-              <option value="" disabled>
-                HH
-              </option>
-              {hours.map((hour) => (
-                <option key={hour} value={hour} disabled={isHourPast(hour)}>
-                  {hour}
-                </option>
-              ))}
-            </select>
-            <span className="text-slate-500">:</span>
-            <select
-              aria-label="Minutos"
-              className={inputClass}
-              value={minutePart}
-              onChange={(e) =>
-                handleDateTimeChange(datePart, hourPart, e.target.value)}
-              required
-            >
-              <option value="" disabled>
-                mm
-              </option>
-              {minuteOptions.map((minute) => (
-                <option key={minute} value={minute} disabled={isToday && hourPart === nowHour && minute < nowMinute}>
-                  {minute}
-                </option>
-              ))}
-            </select>
-          </div>
-        </Field>
+
+        {/* Etiqueta aparte: un <label> envolviendo al botón reabriría el popover
+            al hacer clic en el texto "Hora" mientras ya está abierto. */}
+        <div className="flex flex-col gap-1 text-sm text-slate-600">
+          <span>Hora (24 h)</span>
+          <ClockTimePicker
+            value={timePart}
+            minTime={isToday ? currentTime : undefined}
+            onChange={handleTimeChange}
+          />
+        </div>
+
         <Field label="Estado">
           <select
             className={inputClass}
@@ -146,11 +118,13 @@ export function AppointmentForm({ pets, initialValues, error, submitting, onSubm
             <option value="completed">Completado</option>
           </select>
         </Field>
-        <Field label="Motivo">
-          <input
-            className={inputClass}
+        <Field label="Motivo" className="col-span-2">
+          <textarea
+            className={`${inputClass} min-h-24 resize-y`}
+            rows={3}
             value={values.reason}
             onChange={(e) => handleChange("reason", e.target.value)}
+            placeholder="Describí el motivo de la consulta..."
             required
           />
         </Field>

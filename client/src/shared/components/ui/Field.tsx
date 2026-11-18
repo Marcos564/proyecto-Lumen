@@ -8,9 +8,9 @@ interface FieldProps extends React.FieldsetHTMLAttributes<HTMLLabelElement> {
   children: ReactNode;
 }
 
-export function Field({ label, children }: FieldProps) {
+export function Field({ label, children, className = "" }: FieldProps) {
   return (
-    <label className="flex flex-col gap-1 text-sm text-slate-600">
+    <label className={`flex flex-col gap-1 text-sm text-slate-600 ${className}`}>
       {label}
       {children}
     </label>
