@@ -144,7 +144,6 @@ export function AppointmentForm({ pets, initialValues, error, submitting, onSubm
           >
             <option value="scheduled">Programado</option>
             <option value="completed">Completado</option>
-            <option value="cancelled">Cancelado</option>
           </select>
         </Field>
         <Field label="Motivo">

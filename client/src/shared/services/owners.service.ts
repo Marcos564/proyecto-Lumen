@@ -1,70 +1,57 @@
-import type { Owner, OwnerInput, OwnerWithPets } from "../types";
-import { createMockStore } from "./mock/createMockStore";
-import { ownersMock } from "./mock/owners.mock";
+import { instance } from "../api/axiosInstance";
+import type { ProfileResponse } from "../api/dtos";
+import { fromApiProfile, toCreateProfileBody } from "../api/mappers/owners";
+import { toApiError, unwrap } from "../api/request";
+import type { OwnerInput, OwnerWithPets } from "../types";
 
-const DNI_REGEX = /^\d{7,8}$/;
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+/*
+ * Responsables ⇄ /api/profiles (LumenBackend.API).
+ *
+ * - GET  /api/profiles   listado de perfiles
+ * - POST /api/profiles   alta
+ *
+ * El backend no expone PUT ni DELETE /api/profiles/{id}, y el `GET /{id}` solo
+ * devuelve { id, fullName }. Por eso la pantalla de responsables es de alta y
+ * consulta: no hay acciones de editar/eliminar que no se puedan cumplir.
+ */
 
-// Quita espacios y deja el DNI solo con dígitos (acepta "30.123.456").
-function normalizeOwner(data: OwnerInput): OwnerInput {
-  return {
-    firstName: data.firstName.trim(),
-    lastName: data.lastName.trim(),
-    dni: data.dni.replace(/\D/g, ""),
-    address: data.address.trim(),
-    phone: data.phone.trim(),
-    email: data.email?.trim() || undefined,
-  };
+// La UI todavía no pagina: se pide un lote grande en una sola llamada.
+const PAGE_SIZE = 100;
+
+async function listProfiles(): Promise<ProfileResponse[]> {
+  return unwrap(
+    instance.get<ProfileResponse[]>("profiles", {
+      params: { pageNumber: 1, pageSize: PAGE_SIZE },
+    }),
+  );
 }
-
-function validateOwner(
-  data: OwnerInput,
-  { items, currentId }: { items: readonly Owner[]; currentId?: string },
-) {
-  if (!data.firstName || !data.lastName || !data.address || !data.phone) {
-    throw new Error("Nombre, apellido, dirección y teléfono son obligatorios.");
-  }
-  if (!DNI_REGEX.test(data.dni)) {
-    throw new Error("El DNI debe tener 7 u 8 dígitos.");
-  }
-  if (data.email && !EMAIL_REGEX.test(data.email)) {
-    throw new Error("El email no es válido.");
-  }
-  if (
-    items.some((owner) => owner.dni === data.dni && owner.id !== currentId)
-  ) {
-    throw new Error("Ya existe un responsable con ese DNI.");
-  }
-}
-
-const store = createMockStore<Owner, OwnerInput>({
-  seed: ownersMock,
-  normalize: normalizeOwner,
-  validate: validateOwner,
-  notFoundMessage: "Responsable no encontrado",
-});
-
-// Las mascotas viven en el backend y se vinculan al perfil autenticado, no a
-// estos responsables; por eso el contador se mantiene en 0.
-const withPetCount = (owner: Owner): OwnerWithPets => ({ ...owner, petCount: 0 });
 
 export const ownersService = {
   async list(): Promise<OwnerWithPets[]> {
-    return (await store.list()).map(withPetCount);
+    try {
+      return (await listProfiles()).map(fromApiProfile);
+    } catch (error) {
+      throw toApiError(error);
+    }
   },
 
   async getById(id: string): Promise<OwnerWithPets | undefined> {
-    const owner = await store.getById(id);
-    return owner ? withPetCount(owner) : undefined;
+    try {
+      const profile = (await listProfiles()).find((item) => item.id === id);
+      return profile ? fromApiProfile(profile) : undefined;
+    } catch (error) {
+      throw toApiError(error);
+    }
   },
 
-  async create(data: OwnerInput): Promise<OwnerWithPets> {
-    return withPetCount(await store.create(data));
+  async create(input: OwnerInput): Promise<OwnerWithPets> {
+    try {
+      const created = await unwrap(
+        instance.post<ProfileResponse>("profiles", toCreateProfileBody(input)),
+      );
+      return fromApiProfile(created);
+    } catch (error) {
+      throw toApiError(error);
+    }
   },
-
-  async update(id: string, data: OwnerInput): Promise<OwnerWithPets> {
-    return withPetCount(await store.update(id, data));
-  },
-
-  remove: (id: string) => store.remove(id),
 };

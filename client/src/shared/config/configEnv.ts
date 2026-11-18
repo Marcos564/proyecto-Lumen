@@ -1,26 +1,29 @@
+/**
+ * Configuración del frontend. Una sola variable, una sola fuente de verdad:
+ *
+ *   VITE_API_URL=https://api.lumen-soft.app
+ *
+ * Antes se armaba la URL con host + puerto + protocolo por separado y además
+ * existía un `public/config.json` que nadie leía (y apuntaba a localhost).
+ */
 export interface Config {
   apiUrl: string;
-  port: string;
-  http: string;
   appName: string;
   getUrl: () => string;
 }
+
 let cachedConfig: Config | null = null;
 
 export function getConfig(): Promise<Readonly<Config>> {
-  const getUrl = () => {
-    if (!cachedConfig) {
-      throw new Error("Config not initialized");
-    }
-    return `${cachedConfig.http}://${cachedConfig.apiUrl}:${cachedConfig.port}`;
-  };
   if (!cachedConfig) {
+    const apiUrl = (
+      import.meta.env.VITE_API_URL ?? "https://api.lumen-soft.app"
+    ).replace(/\/+$/, "");
+
     cachedConfig = {
-      port: import.meta.env.VITE_API_PORT ?? "8080",
-      http: import.meta.env.VITE_HTTPS === "true" ? "https" : "http",
-      apiUrl: import.meta.env.VITE_API_URL ?? "localhost",
+      apiUrl,
       appName: import.meta.env.VITE_APP_NAME ?? "Lumen",
-      getUrl: getUrl,
+      getUrl: () => apiUrl,
     };
   }
   return Promise.resolve(cachedConfig);

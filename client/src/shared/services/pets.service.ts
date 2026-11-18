@@ -1,6 +1,6 @@
 import { isAxiosError } from "axios";
 import { instance } from "../api/axiosInstance";
-import { getApiErrorMessage } from "../api/apiError";
+import { toApiError, unwrap } from "../api/request";
 import type {
   MedicalRecord,
   Pet,
@@ -29,16 +29,8 @@ import type {
 // La UI todavía no pagina: se pide un lote de una sola llamada.
 const BATCH_SIZE = 10;
 
-function toError(error: unknown): Error {
-  return new Error(getApiErrorMessage(error));
-}
-
 function isNotFound(error: unknown): boolean {
   return isAxiosError(error) && error.response?.status === 404;
-}
-
-async function unwrap<T>(request: Promise<{ data: T }>): Promise<T> {
-  return (await request).data;
 }
 
 export const petService = {
@@ -50,7 +42,7 @@ export const petService = {
         }),
       );
     } catch (error) {
-      throw toError(error);
+      throw toApiError(error);
     }
   },
 
@@ -60,7 +52,7 @@ export const petService = {
     } catch (error) {
       // 404 = mascota inexistente: para la ficha es un resultado vacío.
       if (isNotFound(error)) return undefined;
-      throw toError(error);
+      throw toApiError(error);
     }
   },
 
@@ -71,7 +63,7 @@ export const petService = {
       );
       return created.id;
     } catch (error) {
-      throw toError(error);
+      throw toApiError(error);
     }
   },
 
@@ -80,7 +72,7 @@ export const petService = {
     try {
       await instance.put(`pets/${id}`, data);
     } catch (error) {
-      throw toError(error);
+      throw toApiError(error);
     }
   },
 
@@ -88,7 +80,7 @@ export const petService = {
     try {
       await instance.delete(`pets/${id}`);
     } catch (error) {
-      throw toError(error);
+      throw toApiError(error);
     }
   },
 
@@ -101,7 +93,7 @@ export const petService = {
       );
     } catch (error) {
       if (isNotFound(error)) return [];
-      throw toError(error);
+      throw toApiError(error);
     }
   },
 
@@ -113,7 +105,7 @@ export const petService = {
         }),
       );
     } catch (error) {
-      throw toError(error);
+      throw toApiError(error);
     }
   },
 
@@ -125,7 +117,7 @@ export const petService = {
         }),
       );
     } catch (error) {
-      throw toError(error);
+      throw toApiError(error);
     }
   },
 };

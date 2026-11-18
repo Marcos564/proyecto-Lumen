@@ -1,63 +1,103 @@
+import { isAxiosError } from "axios";
+import { instance } from "../api/axiosInstance";
+import type { AppointmentResponse } from "../api/dtos";
+import {
+  fromApiAppointment,
+  toCreateAppointmentBody,
+  toUpdateAppointmentBody,
+} from "../api/mappers/appointments";
+import { toApiError, unwrap } from "../api/request";
 import type { Appointment, AppointmentInput, AppointmentStatus } from "../types";
-import { isPastDateTime } from "../utils/dateTime";
-import { appointmentsMock } from "./mock/appointments.mock";
-import { createMockStore } from "./mock/createMockStore";
 
-// Fecha y hora en formato 24 h: YYYY-MM-DDTHH:mm (00:00 a 23:59).
-const DATE_TIME_24H = /^\d{4}-\d{2}-\d{2}T([01]\d|2[0-3]):[0-5]\d$/;
+/*
+ * Acceso HTTP a /api/appointment (LumenBackend.API).
+ *
+ * - GET    /api/appointment       lista (AppointmentResponse[])
+ * - GET    /api/appointment/{id}  detalle
+ * - POST   /api/appointment       alta
+ * - PUT    /api/appointment/{id}  edición (204, sin cuerpo)
+ * - DELETE /api/appointment/{id}  baja (204, sin cuerpo)
+ *
+ * El estado se deriva de `finishedDate` (ver api/mappers/appointments.ts).
+ */
 
-const VALID_STATUSES: AppointmentStatus[] = [
-  "scheduled",
-  "completed",
-  "cancelled",
-];
+// La UI todavía no pagina: se pide un lote grande en una sola llamada.
+const PAGE_SIZE = 100;
 
-function assertValidDate(date: string) {
-  if (!DATE_TIME_24H.test(date)) {
-    throw new Error(`Invalid appointment date: ${date}`);
-  }
+function isNotFound(error: unknown): boolean {
+  return isAxiosError(error) && error.response?.status === 404;
 }
 
-const store = createMockStore<Appointment, AppointmentInput>({
-  seed: appointmentsMock,
-  validate: (data, { mode }) => {
-    assertValidDate(data.date);
-    // Al editar no se restringe: los turnos pasados tienen que poder corregirse.
-    if (mode === "create" && isPastDateTime(data.date)) {
-      throw new Error(
-        "No se puede agendar un turno en una fecha u hora que ya pasó.",
-      );
-    }
-  },
-  notFoundMessage: "Turno no encontrado",
-});
+async function getApiAppointment(id: string): Promise<AppointmentResponse> {
+  return unwrap(instance.get<AppointmentResponse>(`appointment/${id}`));
+}
 
 export const appointmentsService = {
-  list: () => store.list(),
+  async list(): Promise<Appointment[]> {
+    try {
+      const api = await unwrap(
+        instance.get<AppointmentResponse[]>("appointment", {
+          params: { pageNumber: 1, pageSize: PAGE_SIZE },
+        }),
+      );
+      return api.map(fromApiAppointment);
+    } catch (error) {
+      throw toApiError(error);
+    }
+  },
 
-  create: (data: AppointmentInput) => store.create(data),
+  async getById(id: string): Promise<Appointment | undefined> {
+    try {
+      return fromApiAppointment(await getApiAppointment(id));
+    } catch (error) {
+      if (isNotFound(error)) return undefined;
+      throw toApiError(error);
+    }
+  },
 
-  update: (id: string, data: AppointmentInput) => store.update(id, data),
+  async create(input: AppointmentInput): Promise<void> {
+    try {
+      // El POST no devuelve id: la query se recarga desde el backend.
+      await instance.post("appointment", toCreateAppointmentBody(input));
+    } catch (error) {
+      throw toApiError(error);
+    }
+  },
 
-  remove: (id: string) => store.remove(id),
+  async update(id: string, input: AppointmentInput): Promise<void> {
+    try {
+      await instance.put(`appointment/${id}`, toUpdateAppointmentBody(input));
+    } catch (error) {
+      throw toApiError(error);
+    }
+  },
+
+  async remove(id: string): Promise<void> {
+    try {
+      await instance.delete(`appointment/${id}`);
+    } catch (error) {
+      throw toApiError(error);
+    }
+  },
 
   async updateStatus(
     id: string,
     status: AppointmentStatus,
   ): Promise<Appointment> {
-    if (!VALID_STATUSES.includes(status)) {
-      throw new Error(`Invalid appointment status: ${status}`);
+    try {
+      const current = await getApiAppointment(id);
+      const finishedDate =
+        status === "completed" ? new Date().toISOString() : current.assignedDate;
+
+      await instance.put(`appointment/${id}`, {
+        assignedDate: current.assignedDate,
+        finishedDate,
+        reason: current.reason,
+      });
+
+      return fromApiAppointment({ ...current, finishedDate });
+    } catch (error) {
+      throw toApiError(error);
     }
-
-    const current = await store.getById(id);
-    if (!current) throw new Error("Turno no encontrado");
-
-    // El store solo actualiza los campos del input; conservamos el resto.
-    return store.update(id, {
-      patientId: current.patientId,
-      date: current.date,
-      reason: current.reason,
-      status,
-    });
   },
 };

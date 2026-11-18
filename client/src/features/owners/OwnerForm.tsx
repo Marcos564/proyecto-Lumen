@@ -5,7 +5,6 @@ import type { OwnerInput } from "@shared/types";
 
 export interface OwnerFormProps {
   initialValues?: OwnerInput;
-  petCount?: number;
   error?: string;
   submitting?: boolean;
   onSubmit: (values: OwnerInput) => void;
@@ -17,12 +16,14 @@ const emptyValues: OwnerInput = {
   dni: "",
   address: "",
   phone: "",
-  email: "",
+  region: "",
+  country: "",
+  city: "",
+  postalCode: "",
 };
 
 export function OwnerForm(
-  { initialValues = emptyValues, petCount = 0, error, submitting, onSubmit }:
-    OwnerFormProps,
+  { initialValues = emptyValues, error, submitting, onSubmit }: OwnerFormProps,
 ) {
   const [values, setValues] = useState<OwnerInput>(initialValues);
 
@@ -89,24 +90,37 @@ export function OwnerForm(
             />
           </Field>
         </div>
-        <Field label="Email (opcional)">
+        <Field label="Ciudad">
           <input
-            type="email"
             className={inputClass}
-            value={values.email ?? ""}
-            onChange={(e) => handleChange("email", e.target.value)}
+            value={values.city}
+            onChange={(e) => handleChange("city", e.target.value)}
+            required
           />
         </Field>
-        <Field label="Cantidad de mascotas">
+        <Field label="Provincia / Región">
           <input
-            className={`${inputClass} bg-slate-50 text-slate-500`}
-            value={petCount}
-            readOnly
-            tabIndex={-1}
+            className={inputClass}
+            value={values.region}
+            onChange={(e) => handleChange("region", e.target.value)}
+            required
           />
-          <span className="text-xs text-slate-400">
-            Se calcula según los pacientes asignados.
-          </span>
+        </Field>
+        <Field label="País">
+          <input
+            className={inputClass}
+            value={values.country}
+            onChange={(e) => handleChange("country", e.target.value)}
+            required
+          />
+        </Field>
+        <Field label="Código postal">
+          <input
+            className={inputClass}
+            value={values.postalCode}
+            onChange={(e) => handleChange("postalCode", e.target.value)}
+            required
+          />
         </Field>
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}

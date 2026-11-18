@@ -6,8 +6,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
  */
 export interface CrudService<T, TInput> {
   list: () => Promise<T[]>;
-  create: (input: TInput) => Promise<T>;
-  update: (id: string, input: TInput) => Promise<T>;
+  // El backend responde 204 (sin cuerpo) en varias altas/ediciones, así que la
+  // UI no puede esperar un T acá: siempre recarga la lista desde el servidor.
+  create: (input: TInput) => Promise<unknown>;
+  update: (id: string, input: TInput) => Promise<unknown>;
   remove: (id: string) => Promise<void>;
 }
 

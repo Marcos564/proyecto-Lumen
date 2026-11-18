@@ -1,6 +1,4 @@
-import { Pencil, Trash2 } from "lucide-react";
 import { Table } from "@shared/components/ui/Table";
-import { IconButton } from "@shared/components/ui/IconButton";
 import { TableSkeleton } from "@shared/components/ui/Skeletons";
 import type { OwnerWithPets } from "@shared/types";
 import { ownerFullName } from "../ownerFullName";
@@ -8,15 +6,11 @@ import { ownerFullName } from "../ownerFullName";
 interface OwnersTableProps {
   owners: OwnerWithPets[];
   isLoading: boolean;
-  onEdit: (owner: OwnerWithPets) => void;
-  onDelete: (owner: OwnerWithPets) => void;
 }
 
-export function OwnersTable(
-  { owners, isLoading, onEdit, onDelete }: OwnersTableProps,
-) {
+export function OwnersTable({ owners, isLoading }: OwnersTableProps) {
   if (isLoading) {
-    return <TableSkeleton rows={6} columns={6} />;
+    return <TableSkeleton rows={6} columns={5} />;
   }
 
   return (
@@ -33,34 +27,14 @@ export function OwnersTable(
             </span>
           ),
         },
-        { header: "DNI", render: (owner) => owner.dni },
         { header: "Dirección", render: (owner) => owner.address },
         { header: "Teléfono", render: (owner) => owner.phone },
-        { header: "Email", render: (owner) => owner.email || "—" },
-        { header: "Mascotas", render: (owner) => owner.petCount },
         {
-          header: "",
-          className: "w-20",
-          render: (owner) => (
-            <div className="flex items-center gap-1">
-              <IconButton
-                icon={Pencil}
-                label="Editar"
-                onClick={() => onEdit(owner)}
-              />
-              <IconButton
-                icon={Trash2}
-                label={owner.petCount > 0
-                  ? "No se puede eliminar: tiene mascotas"
-                  : "Eliminar"}
-                tone="danger"
-                className="disabled:cursor-not-allowed disabled:opacity-40"
-                disabled={owner.petCount > 0}
-                onClick={() => onDelete(owner)}
-              />
-            </div>
-          ),
+          header: "Ubicación",
+          render: (owner) =>
+            [owner.city, owner.country].filter(Boolean).join(", ") || "—",
         },
+        { header: "Mascotas", render: (owner) => owner.petCount },
       ]}
     />
   );

@@ -1,15 +1,15 @@
 import type { AppointmentStatus } from "@shared/types";
 
+// El backend deriva el estado de finishedDate, así que solo estos dos estados
+// se pueden representar de punta a punta.
 export const appointmentStatuses: AppointmentStatus[] = [
   "scheduled",
   "completed",
-  "cancelled",
 ];
 
 export const statusLabels: Record<AppointmentStatus, string> = {
   scheduled: "Programado",
   completed: "Completado",
-  cancelled: "Cancelado",
 };
 
 export const statusTones: Record<
@@ -18,5 +18,4 @@ export const statusTones: Record<
 > = {
   scheduled: "warning",
   completed: "success",
-  cancelled: "danger",
 };
