@@ -1,21 +1,33 @@
 import axios from "axios";
-import { getConfig } from "../index.ts";
+import { getConfig, tokenKey } from "../index.ts";
 
 const instance = axios.create({
-  withCredentials: false,
+  withCredentials: true,
 });
+
+
 instance.interceptors.request.use(async (config) => {
-  const envConfig = await getConfig(); // Si es async
-  config.baseURL = `${envConfig.getUrl()}/api/`;
+  const envConfig = await getConfig();
+
+    // ANTES: getUrl() devolvía solamente protocolo, servidor y puerto.
+  // Por eso era necesario agregar manualmente "/api/".
+  // config.baseURL = `${envConfig.getUrl()}/api/`;
+
+  // AHORA: VITE_API_BASE_URL ya contiene la URL completa,
+  // incluyendo "/api/", por lo que no es necesario concatenarla.
+  config.baseURL = envConfig.getUrl();
+
   console.log(
     "axiosInstance.baseURL configurada para esta petición:",
     config.baseURL,
   );
+
   return config;
 });
+
 instance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem(tokenKey);
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -36,7 +48,7 @@ instance.interceptors.response.use(
         localStorage.clear();
         location.href = "/login";
       } else {
-        localStorage.removeItem("token");
+        localStorage.removeItem(tokenKey);
       }
     }
 

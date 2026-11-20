@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Button } from "../../components/ui/Button";
-import { Field, inputClass } from "../../components/ui/Field";
-import type { PatientInput } from "../../services/patients.service";
-import type { Owner } from "../../types";
-import { ownerFullName } from "../owners/ownerFullName";
+import { Button } from "../../../components/ui/Button";
+import { Field, inputClass } from "../../../components/ui/Field";
+import type { PatientInput } from "../../../services/patients.service";
+import type { Owner } from "../../../types";
+import { ownerFullName } from "../../owners/ownerFullName";
+import { breeds, species } from "../mock/breed";
 
 interface PatientFormProps {
   owners: Owner[];
@@ -51,20 +52,40 @@ export function PatientForm(
           />
         </Field>
         <Field label="Especie">
-          <input
+           <select
             className={inputClass}
             value={values.species}
-            onChange={(e) => handleChange("species", e.target.value)}
+            onChange={(e) => {
+              handleChange("species", e.target.value);
+            }}
             required
-          />
+          >
+            <option value="" disabled>
+              Seleccioná una especie
+            </option>
+            {species.map((specie) => (
+              <option key={specie.name} value={specie.name}>
+                {specie.name}
+              </option>
+            ))}
+          </select>
         </Field>
         <Field label="Raza">
-          <input
+          <select
             className={inputClass}
             value={values.breed}
             onChange={(e) => handleChange("breed", e.target.value)}
             required
-          />
+          >
+            <option value="" disabled>
+              Seleccioná una raza
+            </option>
+            {breeds.map((breed) => (
+              <option key={breed.name} value={breed.name}>
+                {breed.name}
+              </option>
+            ))}
+          </select>
         </Field>
         <Field label="Fecha de nacimiento">
           <input
@@ -74,7 +95,7 @@ export function PatientForm(
             onChange={(e) => handleChange("birthDate", e.target.value)}
           />
         </Field>
-        <Field label="Dueño">
+        <Field label="Responsable">
           <select
             className={inputClass}
             value={values.ownerId}
@@ -82,7 +103,7 @@ export function PatientForm(
             required
           >
             <option value="" disabled>
-              Seleccioná un dueño
+              Seleccioná un responsable
             </option>
             {owners.map((owner) => (
               <option key={owner.id} value={owner.id}>

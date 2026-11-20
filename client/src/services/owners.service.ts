@@ -39,7 +39,7 @@ function validateOwner(data: OwnerInput, currentId?: string) {
   if (
     owners.some((owner) => owner.dni === data.dni && owner.id !== currentId)
   ) {
-    throw new Error("Ya existe un dueño con ese DNI.");
+    throw new Error("Ya existe un responsable con ese DNI.");
   }
 }
 
@@ -93,7 +93,7 @@ export async function deleteOwner(id: string): Promise<void> {
   await delay();
   if (countPatientsByOwner(id) > 0) {
     throw new Error(
-      "No se puede eliminar un dueño que tiene mascotas registradas.",
+      "No se puede eliminar un responsable que tiene mascotas registradas.",
     );
   }
   owners = owners.filter((owner) => owner.id !== id);

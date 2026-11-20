@@ -9,7 +9,7 @@ export const AuthStatusBadge = () => {
       <User className="h-5 w-5" />
       <div className="text-xs">
         <div className="font-bold text-slate-800">
-          {user?.fullName || jwtPayload?.sub || "Usuario desconocido"}
+          {user?.fullName || "Usuario"}
         </div>
         <div className="text-slate-500 flex items-center gap-1.5">
           <span>

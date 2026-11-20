@@ -17,7 +17,7 @@ lerna-debug.log*
 
 # Variables de entorno
 .env
-.env.*
+
 !.env.example
 
 # Editores y sistema

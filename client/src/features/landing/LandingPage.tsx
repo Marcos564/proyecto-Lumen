@@ -48,7 +48,7 @@ const FEATURES = [
   },
   {
     icon: Users,
-    title: "Dueños",
+    title: "Responsables",
     text:
       "Base de clientes con sus datos de contacto y todas las mascotas asociadas.",
   },
@@ -271,7 +271,7 @@ export function LandingPage(): JSX.Element {
                 <span className="block text-lumen-600">tu veterinaria</span>
               </h1>
               <p className="mt-5 max-w-md leading-relaxed text-lumen-dark-500">
-                Lumen reúne pacientes, dueños, especialistas, turnos e
+                Lumen reúne pacientes, responsables/responsables, especialistas, turnos e
                 inventario en una sola plataforma, para que tu equipo dedique
                 menos tiempo a la administración y más a las mascotas.
               </p>
@@ -343,7 +343,7 @@ export function LandingPage(): JSX.Element {
                 centraliza todo lo que pasa en tu veterinaria.
               </p>
               <p className="mt-4 leading-relaxed text-lumen-dark-500">
-                Cada mascota tiene su ficha vinculada a su dueño, cada turno
+                Cada mascota tiene su ficha vinculada a su responsable, cada turno
                 queda asignado a un especialista y el inventario se actualiza
                 desde el mismo sistema, accesible desde cualquier navegador.
               </p>
