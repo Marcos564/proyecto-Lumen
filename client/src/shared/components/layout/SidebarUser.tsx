@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronUp, LogIn, LogOut, User } from "lucide-react";
-import { useAuth } from "../../shared";
+import { useAuth } from "../../index";
 import { Button } from "../ui/Button";
 import { Link } from "../ui/Link";
 

@@ -4,7 +4,7 @@ import {
   getOwnerById,
   getOwners,
   type OwnerWithPets,
-} from "../../../services/owners.service";
+} from "@shared/services/owners.service";
 
 // Claves de caché de React Query para responsables. Usarlas siempre desde acá
 // para que las invalidaciones de otras features (p. ej. pacientes) coincidan.

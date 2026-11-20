@@ -1,7 +1,7 @@
 import type { Appointment, AppointmentStatus } from '../types'
 import { appointmentsMock } from './mock/appointments.mock'
 import { delay } from './mock/delay'
-import { isPastDateTime } from './dateTime'
+import { isPastDateTime } from '../utils/dateTime'
 
 let appointments: Appointment[] = [...appointmentsMock];
 

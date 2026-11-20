@@ -1,4 +1,4 @@
-import type { Owner } from "../../types";
+import type { Owner } from "@shared/types";
 
 export function ownerFullName(
   owner: Pick<Owner, "firstName" | "lastName">,

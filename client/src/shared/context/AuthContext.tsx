@@ -5,12 +5,8 @@ import {
   useMemo,
   useState,
 } from "react";
-import {
-  authService,
-  type SignInRequest,
-  type SignInResponse,
-  type User,
-} from "../../features/auth/index.ts";
+import { authService } from "../services/auth.service.ts";
+import type { SignInRequest, SignInResponse, User } from "../types/auth.ts";
 import { jwtDecode } from "jwt-decode";
 import { profileKey, tokenKey } from "../constant/localStorage.ts";
 interface AuthContextType {
@@ -41,11 +37,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
   const [user, setUserRaw] = useState<User | null>(() => {
     const userData = localStorage.getItem(profileKey);
-    return userData ? JSON.parse(userData) : null;
+    if (!userData) return null;
+    try {
+      return JSON.parse(userData) as User;
+    } catch {
+      // Perfil corrupto: lo descartamos en vez de romper el arranque.
+      localStorage.removeItem(profileKey);
+      return null;
+    }
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return !!localStorage.getItem(tokenKey) && !!localStorage.getItem(profileKey);
+    // La sesión depende del token válido, no del perfil: el perfil es solo
+    // informativo y su ausencia no debe expulsar al usuario al recargar.
+    const storedToken = localStorage.getItem(tokenKey);
+    if (!storedToken) return false;
+    try {
+      // Validamos expiración desde el inicio para no mostrar rutas privadas
+      // con un token vencido y luego expulsar al usuario.
+      const decoded = jwtDecode<JwtPayload>(storedToken);
+      return decoded.exp * 1000 > Date.now();
+    } catch {
+      return false;
+    }
   });
   const setUser = (newUser: User | null) => {
     if (newUser) {
@@ -74,7 +88,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data: SignInResponse = await authService.signIn(credentials);
       if (data?.accessToken) {
         setToken(data.accessToken);
-        setUser(data.user);
+        // El backend devuelve `profile`; soportamos `user` por compatibilidad.
+        setUser(data.profile ?? data.user ?? null);
         setIsAuthenticated(true);
       }
       return data;
@@ -101,13 +116,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const currentTime = Date.now() / 1000;
       if (decoded.exp < currentTime) {
-        signOut();
         return null;
       }
       return decoded;
     } catch (error) {
       console.error("Token inválido", error);
-      signOut();
       return null;
     }
   }, [token]);
@@ -127,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       jwtPayload,
     }),
-    [isLoading, isAuthenticated, jwtPayload],
+    [isLoading, isAuthenticated, jwtPayload, user],
   );
   
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

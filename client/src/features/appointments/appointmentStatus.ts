@@ -1,4 +1,4 @@
-import type { AppointmentStatus } from "../../types";
+import type { AppointmentStatus } from "@shared/types";
 
 export const appointmentStatuses: AppointmentStatus[] = [
   "scheduled",
