@@ -8,7 +8,7 @@ export function usePatientsById(id: string) {
     enabled: !!id, // Opcional: evita que se ejecute si el id no existe todavía
   });
 }
-export function getMedicalRecord(id: string, pageSize?: number, pageNumber?: number) {
+export function useMedicalRecord(id: string, pageSize?: number, pageNumber?: number) {
   return useQuery({
     queryKey: ["patient", id],
     queryFn: async () => patientServices.getMedicalRecords(id, pageSize || 10, pageNumber || 1),

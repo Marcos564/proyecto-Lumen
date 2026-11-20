@@ -19,6 +19,7 @@ import type { Patient } from "../../types";
 import { ownerFullName } from "../owners/ownerFullName";
 import { PatientForm } from "./PatientForm";
 import { useAllPets } from "./hooks/usePatient";
+import type { ResponsePet } from "./types/patientTypes";
 
 export function PatientsListPage() {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ export function PatientsListPage() {
   const [search, setSearch] = useState("");
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
-  const { data: patients, isLoading } = useAllPets();
+  const { data: patients = [], isLoading } = useAllPets();
   const { data: owners = [] } = useQuery({
     queryKey: ["owners"],
     queryFn: getOwners,
@@ -68,7 +69,7 @@ export function PatientsListPage() {
 
   const filteredPatients = useMemo(() => {
     const term = search.trim().toLowerCase();
-    if (!term || patients === undefined) return patients;
+    if (!term || patients === undefined) return patients ?? [];
     return patients.filter((patient) => {
       const owner = ownersById.get(patient?.ownerId);
       return (
@@ -119,7 +120,7 @@ export function PatientsListPage() {
         placeholder="Buscar por paciente, dueño o DNI..."
       />
 
-      <Table<GetPatientsResponse[number]>
+      <Table<ResponsePet>
         data={filteredPatients}
         keyExtractor={(patient) => patient.id}
         onRowClick={(patient) => navigate(`/pacientes/${patient.id}`)}
@@ -135,7 +136,7 @@ export function PatientsListPage() {
           },
           {
             header: "Especie / Raza",
-            render: (p) => `${p.species} · ${p.breed}`,
+            render: (p) => `${p.species ?? p.specie ?? "—"} · ${p.breed ?? p.race ?? "—"}`,
           },
           {
             header: "Dueño",
@@ -151,8 +152,8 @@ export function PatientsListPage() {
           {
             header: "Estado",
             render: (p) => (
-              <Badge tone={p.status === "active" ? "success" : "neutral"}>
-                {p.status === "active" ? "Activo" : "Inactivo"}
+              <Badge tone={p.status === "active" || p.status === "alive" ? "success" : "neutral"}>
+                {p.status === "active" || p.status === "alive" ? "Activo" : "Inactivo"}
               </Badge>
             ),
           },
@@ -167,7 +168,7 @@ export function PatientsListPage() {
                 <IconButton
                   icon={Pencil}
                   label="Editar"
-                  onClick={() => openEditModal(p)}
+                  onClick={() => openEditModal(p as unknown as Patient)}
                 />
                 <IconButton
                   icon={Trash2}
