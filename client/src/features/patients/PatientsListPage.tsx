@@ -47,7 +47,7 @@ export function PatientsListPage() {
         patients={filteredPatients}
         ownersById={ownersById}
         isLoading={isLoading}
-        onRowClick={(patient) => navigate(`/pets/${patient.id}`)}
+        onRowClick={(patient) => navigate(`/pacientes/${patient.id}`)}
         onEdit={formModal.openEdit}
         onDelete={(patient) => deletePatient.mutate(patient.id)}
       />
