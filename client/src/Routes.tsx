@@ -130,6 +130,16 @@ export const Routes = createBrowserRouter([
       {
         path: "owners",
         element: (
+                    /*
+          <Suspense fallback={<FallbackLoading />}>
+            <OwnersListPage />
+          </Suspense>
+          */
+
+          // ANTES: la ruta /duenos mostraba incorrectamente
+          // el listado de especialistas.
+          // AHORA: se utiliza OwnersListPage para mostrar los dueños.
+          // SpecialistsListPage se conserva en la ruta /especialistas.
           <Suspense fallback={<FallbackLoading />}>
             <OwnersListPage />
           </Suspense>
